@@ -153,4 +153,121 @@
         }
         .handle-ball {
             position: absolute; top: -40px; left: -20px; width: 60px; height: 60px;
-            background: radial-gradient(circle at 30%
+            background: radial-gradient(circle at 30% 30%, #ff5e5e, #8b0000);
+            border-radius: 50%;
+        }
+
+        .handle-wrapper.active .handle-stick { transform: rotateX(60deg) translateY(20px); }
+
+        /* 模糊動畫 */
+        .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(8px); opacity: 0.7; }
+        @keyframes scrollBlur {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-120px); }
+        }
+
+        #hidden-reset-btn { position: fixed; bottom: 5px; right: 5px; width: 15px; height: 15px; opacity: 0.1; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="wait-view">
+        <h1>創意思考遊戲：期待值</h1>
+        <div id="counter">0</div>
+        <p>位同學的創意碎片已就位</p>
+        <div id="qrcode" style="display: flex; justify-content: center; margin: 25px;"></div>
+        <button class="btn-go" onclick="showSlotMachine()">解鎖權限並準備揭曉 (GO!)</button>
+    </div>
+
+    <div id="slot-view" class="hidden">
+        <div class="machine-wrapper">
+            <div class="slot-machine">
+                <div class="machine-header">CREATIVE SLOT</div>
+                <div class="slots-viewport" id="viewport">
+                    <div class="slot-column"><div id="s1" class="slot-item">？</div></div>
+                    <div class="slot-column"><div id="s2" class="slot-item">？</div></div>
+                    <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
+                </div>
+            </div>
+            <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
+                <div class="handle-base"></div>
+                <div class="handle-stick"><div class="handle-ball"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="hidden-reset-btn" onclick="clearGoogleSheets()"></button>
+
+<audio id="snd-spin" loop src="https://cdn.pixabay.com/audio/2022/03/19/audio_13324838.mp3"></audio>
+<audio id="snd-stop" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1b351167b0.mp3"></audio>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
+    let allData = { who: [], where: [], doing: [] };
+    let isAudioUnlocked = false;
+
+    // 初始化 QR Code
+    new QRCode(document.getElementById("qrcode"), {
+        text: window.location.href.replace('admin.html', 'index.html'),
+        width: 220, height: 220
+    });
+
+    setInterval(fetchData, 3000);
+    fetchData();
+
+    function fetchData() {
+        fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
+            allData = data;
+            document.getElementById('counter').innerText = data.who.length;
+        }).catch(err => console.log("等待資料中..."));
+    }
+
+    function showSlotMachine() {
+        if (allData.who.length === 0) return alert("還沒有人投稿喔！");
+        const spinSnd = document.getElementById('snd-spin');
+        spinSnd.play().then(() => { 
+            spinSnd.pause(); 
+            isAudioUnlocked = true; 
+        }).catch(() => { 
+            isAudioUnlocked = false; 
+        });
+        document.getElementById('wait-view').classList.add('hidden');
+        document.getElementById('slot-view').classList.remove('hidden');
+    }
+
+    function startSpinHandle() {
+        document.getElementById('handle').classList.add('active');
+        document.getElementById('s1').classList.add('blur-animate');
+        document.getElementById('s2').classList.add('blur-animate');
+        document.getElementById('s3').classList.add('blur-animate');
+        if (isAudioUnlocked) document.getElementById('snd-spin').play();
+    }
+
+    function stopSpinHandle() {
+        document.getElementById('handle').classList.remove('active');
+        document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
+        if (isAudioUnlocked) {
+            document.getElementById('snd-spin').pause();
+            document.getElementById('snd-stop').play();
+        }
+        if (allData.who.length > 0) {
+            document.getElementById('s1').innerText = allData.who[Math.floor(Math.random()*allData.who.length)];
+            document.getElementById('s2').innerText = allData.where[Math.floor(Math.random()*allData.where.length)];
+            document.getElementById('s3').innerText = allData.doing[Math.floor(Math.random()*allData.doing.length)];
+        }
+    }
+
+    function clearGoogleSheets() {
+        const password = prompt("管理密碼 (1234):");
+        if (password === "1234" && confirm("確定清空資料？")) {
+            fetch(GAS_URL + "?action=clear").then(() => {
+                alert("已清空！");
+                fetchData();
+            });
+        }
+    }
+</script>
+</body>
+</html>
