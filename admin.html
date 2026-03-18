@@ -79,12 +79,21 @@
     // 音效
     function playTick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-        gain.connect(audioCtx.destination); osc.connect(gain);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'sine'; // 使用正弦波，聲音比較圓潤但有力
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime); // 從高頻開始
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05); // 快速降到低頻，模擬敲擊聲
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
     }
 
     // 切換畫面
