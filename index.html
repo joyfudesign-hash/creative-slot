@@ -34,7 +34,7 @@
 </div>
 
 <script>
-    // ⚠️ 老師！請記得在此處貼上您最新部署的 GAS URL
+    // ⚠️ 老師！我已經幫您換成您剛才給我的最新 GAS URL 了
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
 
     function submitData() {
@@ -44,4 +44,44 @@
         const btn = document.getElementById('submit-btn');
         const msg = document.getElementById('status-msg');
 
-        if (!who || !where || !doing) return alert("三個格子都要
+        if (!who || !where || !doing) {
+            alert("三個格子都要填寫喔！");
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerText = "傳送中...";
+        msg.innerText = "正在送往老師的螢幕...";
+
+        // 使用 POST 方式傳送
+        fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ who: who, where: where, doing: doing })
+        })
+        .then(() => {
+            btn.innerText = "傳送成功！";
+            btn.style.background = "#bdc3c7";
+            msg.innerText = "🎉 已成功送達！";
+            
+            setTimeout(() => {
+                document.getElementById('input-who').value = "";
+                document.getElementById('input-where').value = "";
+                document.getElementById('input-doing').value = "";
+                btn.disabled = false;
+                btn.innerText = "確認上傳";
+                btn.style.background = "#27ae60";
+                msg.innerText = "";
+            }, 2500);
+        })
+        .catch((err) => {
+            console.error(err);
+            alert("連線失敗，請檢查網路。");
+            btn.disabled = false;
+            btn.innerText = "確認上傳";
+            msg.innerText = "";
+        });
+    }
+</script>
+</body>
+</html>
