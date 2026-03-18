@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創意思考：神祕重組老虎機</title>
+    <title>創意思考：神祕重組老虎機 (進階版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
@@ -11,11 +11,10 @@
             --bg-dark: #121212;
             --machine-body: #8b0000;
             --neon-red: #ff3131;
-            --neon-blue: #0bdfff;
         }
 
         body {
-            font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            font-family: "Microsoft JhengHei", sans-serif;
             background-color: var(--bg-dark);
             background-image: radial-gradient(circle, #2c3e50 0%, #121212 100%);
             margin: 0;
@@ -27,157 +26,63 @@
             color: white;
         }
 
-        .container {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
+        .container { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         .hidden { display: none !important; }
 
-        /* --- 等待畫面 --- */
         #wait-view {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
-            border-radius: 20px;
-            border: 4px solid var(--gold);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            text-align: center; background: rgba(0, 0, 0, 0.8); padding: 40px; border-radius: 20px;
+            border: 4px solid var(--gold); box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
         }
 
-        #counter {
-            font-size: 120px;
-            font-weight: bold;
-            color: #e74c3c;
-            margin: 20px 0;
-            text-shadow: 0 0 20px #e74c3c, 0 0 40px #ff3131;
-        }
+        #counter { font-size: 120px; font-weight: bold; color: #e74c3c; margin: 20px 0; text-shadow: 0 0 20px #e74c3c; }
 
         .btn-go {
-            background: #2980b9;
-            color: white;
-            border: none;
-            padding: 20px 60px;
-            border-radius: 50px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px #1c5478;
-            transition: all 0.2s;
+            background: #2980b9; color: white; border: none; padding: 20px 60px; border-radius: 50px;
+            font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 5px #1c5478; transition: all 0.2s;
         }
 
-        .btn-go:active { transform: translateY(4px); box-shadow: 0 2px #1c5478; }
-
-        /* --- 老虎機畫面 --- */
-        #slot-view {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-
-        .machine-wrapper {
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-        }
-
+        #slot-view { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
+        .machine-wrapper { position: relative; display: flex; align-items: flex-end; }
         .slot-machine {
-            background-color: var(--machine-body);
-            width: 70vw;
-            max-width: 900px;
-            height: 80vh;
-            border-radius: 30px 30px 10px 10px;
-            border: 15px solid #4a0000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: var(--machine-body); width: 70vw; max-width: 900px; height: 80vh;
+            border-radius: 30px; border: 15px solid #4a0000; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box;
         }
 
-        .machine-header {
-            font-size: 3rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red);
-            margin-bottom: 20px;
-        }
-
+        .machine-header { font-size: 3rem; font-weight: bold; text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red); margin-bottom: 20px; }
         .slots-viewport {
-            width: 100%;
-            flex: 1;
-            background: #fff;
-            border-radius: 15px;
-            border: 10px solid var(--gold);
-            display: flex;
-            justify-content: space-around;
-            overflow: hidden;
-            position: relative;
+            width: 100%; flex: 1; background: #fff; border-radius: 15px; border: 10px solid var(--gold);
+            display: flex; justify-content: space-around; overflow: hidden; position: relative;
         }
+        .slots-viewport::after { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 4px; background: rgba(255, 49, 49, 0.7); z-index: 10; }
 
-        .slots-viewport::after {
-            content: '';
-            position: absolute;
-            top: 50%; left: 0; width: 100%; height: 4px;
-            background: rgba(255, 49, 49, 0.7);
-            z-index: 10;
-        }
-
-        .slot-column { width: 32%; height: 100%; border-right: 2px solid #ccc; }
+        .slot-column { width: 32%; height: 100%; border-right: 2px solid #ccc; display: flex; align-items: center; justify-content: center; }
         .slot-column:last-child { border-right: none; }
+        .slot-item { font-size: 4rem; font-weight: bold; color: #333; text-align: center; }
 
-        .slot-item {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-        }
-
-        /* --- 拉桿樣式 --- */
         .handle-wrapper { width: 80px; height: 60vh; margin-left: 20px; position: relative; cursor: pointer; }
         .handle-base { position: absolute; bottom: 50px; width: 80px; height: 120px; background: #555; border-radius: 10px; }
         .handle-stick {
             position: absolute; bottom: 110px; left: 30px; width: 20px; height: 35vh;
-            background: linear-gradient(to right, #bdbdbd, #ffffff, #bdbdbd);
-            transform-origin: bottom center;
-            transition: transform 0.2s;
+            background: linear-gradient(to right, #bdbdbd, #ffffff, #bdbdbd); transform-origin: bottom center; transition: transform 0.2s;
         }
-        .handle-ball {
-            position: absolute; top: -40px; left: -20px; width: 60px; height: 60px;
-            background: radial-gradient(circle at 30% 30%, #ff5e5e, #8b0000);
-            border-radius: 50%;
-        }
-
+        .handle-ball { position: absolute; top: -40px; left: -20px; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, #ff5e5e, #8b0000); border-radius: 50%; }
         .handle-wrapper.active .handle-stick { transform: rotateX(60deg) translateY(20px); }
 
-        /* 模糊動畫 */
         .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(8px); opacity: 0.7; }
-        @keyframes scrollBlur {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-120px); }
-        }
+        @keyframes scrollBlur { 0% { transform: translateY(0); } 100% { transform: translateY(-20px); } }
 
-        #hidden-reset-btn { position: fixed; bottom: 5px; right: 5px; width: 15px; height: 15px; opacity: 0.1; cursor: pointer; }
+        #hidden-reset-btn { position: fixed; bottom: 5px; right: 5px; width: 20px; height: 20px; opacity: 0.1; cursor: pointer; border: none; background: transparent; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="wait-view">
-        <h1>創意思考遊戲：期待值</h1>
+        <h1>創意思考：期待值</h1>
         <div id="counter">0</div>
         <p>位同學的創意碎片已就位</p>
         <div id="qrcode" style="display: flex; justify-content: center; margin: 25px;"></div>
-        <button class="btn-go" onclick="showSlotMachine()">解鎖權限並準備揭曉 (GO!)</button>
+        <button class="btn-go" onclick="showSlotMachine()">解鎖並啟動 (GO!)</button>
     </div>
 
     <div id="slot-view" class="hidden">
@@ -190,7 +95,7 @@
                     <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
                 </div>
             </div>
-            <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
+            <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()">
                 <div class="handle-base"></div>
                 <div class="handle-stick"><div class="handle-ball"></div></div>
             </div>
@@ -200,15 +105,16 @@
 
 <button id="hidden-reset-btn" onclick="clearGoogleSheets()"></button>
 
-<audio id="snd-spin" loop src="https://cdn.pixabay.com/audio/2022/03/19/audio_13324838.mp3"></audio>
-<audio id="snd-stop" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1b351167b0.mp3"></audio>
+<!-- 使用 Google Actions 音效庫，更穩定 -->
+<audio id="snd-spin" loop src="https://actions.google.com/sounds/v1/science_fiction/glitch_low_power_loop.ogg"></audio>
+<audio id="snd-stop" src="https://actions.google.com/sounds/v1/foley/door_slam.ogg"></audio>
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     let allData = { who: [], where: [], doing: [] };
+    let usedIndices = { who: [], where: [], doing: [] };
     let isAudioUnlocked = false;
 
-    // 初始化 QR Code
     new QRCode(document.getElementById("qrcode"), {
         text: window.location.href.replace('admin.html', 'index.html'),
         width: 220, height: 220
@@ -219,52 +125,57 @@
 
     function fetchData() {
         fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
+            if (data.who.length !== allData.who.length) {
+                usedIndices = { who: [], where: [], doing: [] };
+            }
             allData = data;
             document.getElementById('counter').innerText = data.who.length;
-        }).catch(err => console.log("等待資料中..."));
+        });
     }
 
     function showSlotMachine() {
-        if (allData.who.length === 0) return alert("還沒有人投稿喔！");
-        const spinSnd = document.getElementById('snd-spin');
-        spinSnd.play().then(() => { 
-            spinSnd.pause(); 
-            isAudioUnlocked = true; 
-        }).catch(() => { 
-            isAudioUnlocked = false; 
-        });
+        if (allData.who.length === 0) return alert("還沒有資料喔！");
+        const s1 = document.getElementById('snd-spin');
+        s1.play().then(() => { s1.pause(); isAudioUnlocked = true; }).catch(() => { isAudioUnlocked = false; });
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
     }
 
     function startSpinHandle() {
         document.getElementById('handle').classList.add('active');
-        document.getElementById('s1').classList.add('blur-animate');
-        document.getElementById('s2').classList.add('blur-animate');
-        document.getElementById('s3').classList.add('blur-animate');
+        document.querySelectorAll('.slot-item').forEach(el => el.classList.add('blur-animate'));
         if (isAudioUnlocked) document.getElementById('snd-spin').play();
+    }
+
+    function getRandomUnique(category) {
+        let pool = allData[category];
+        if (usedIndices[category].length >= pool.length) usedIndices[category] = [];
+        
+        let available = pool.map((_, i) => i).filter(i => !usedIndices[category].includes(i));
+        let idx = available[Math.floor(Math.random() * available.length)];
+        usedIndices[category].push(idx);
+        return pool[idx];
     }
 
     function stopSpinHandle() {
         document.getElementById('handle').classList.remove('active');
         document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
-        if (isAudioUnlocked) {
-            document.getElementById('snd-spin').pause();
-            document.getElementById('snd-stop').play();
-        }
+        if (isAudioUnlocked) { document.getElementById('snd-spin').pause(); document.getElementById('snd-stop').play(); }
+
         if (allData.who.length > 0) {
-            document.getElementById('s1').innerText = allData.who[Math.floor(Math.random()*allData.who.length)];
-            document.getElementById('s2').innerText = allData.where[Math.floor(Math.random()*allData.where.length)];
-            document.getElementById('s3').innerText = allData.doing[Math.floor(Math.random()*allData.doing.length)];
+            document.getElementById('s1').innerText = getRandomUnique('who');
+            document.getElementById('s2').innerText = getRandomUnique('where');
+            document.getElementById('s3').innerText = getRandomUnique('doing');
         }
     }
 
     function clearGoogleSheets() {
-        const password = prompt("管理密碼 (1234):");
-        if (password === "1234" && confirm("確定清空資料？")) {
+        const password = prompt("密碼:");
+        if (password === "1234" && confirm("確定清空？")) {
             fetch(GAS_URL + "?action=clear").then(() => {
-                alert("已清空！");
+                usedIndices = { who: [], where: [], doing: [] };
                 fetchData();
+                alert("已清空！");
             });
         }
     }
