@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創意思考：詞句重組老虎機</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --primary: #6c5ce7; --secondary: #a29bfe; --bg: #f0f2f5; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 800px; text-align: center; }
+        
+        /* 模式切換 */
+        .hidden { display: none; }
+        
+        /* 學生端樣式 */
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 18px; transition: 0.3s; width: 100%; }
+        button:hover { background: var(--secondary); }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* 老虎機樣式 */
+        .slots { display: flex; justify-content: space-around; background: #333; padding: 20px; border-radius: 15px; border: 8px solid #ffd700; margin: 20px 0; overflow: hidden; height: 120px; }
+        .slot-column { width: 30%; background: white; height: 100%; border-radius: 5px; overflow: hidden; position: relative; }
+        .slot-wrapper { position: absolute; width: 100%; transition: top 0.1s ease-out; top: 0; }
+        .slot-item { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-bottom: 1px solid #eee; color: #333; padding: 0 10px; }
+
+        .qr-section { margin-top: 20px; display: flex; flex-direction: column; align-items: center; }
+        #counter { font-size: 20px; color: var(--primary); font-weight: bold; margin: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="teacher-view">
+        <h1>創意思考詞句重組</h1>
+        <div id="counter">目前上傳人數：0 人</div>
+        
+        <div class="slots">
+            <div class="slot-column"><div id="slot-who" class="slot-wrapper"><div class="slot-item">誰？</div></div></div>
+            <div class="slot-column"><div id="slot-where" class="slot-wrapper"><div class="slot-item">在哪裡？</div></div></div>
+            <div class="slot-column"><div id="slot-doing" class="slot-wrapper"><div class="slot-item">做什麼？</div></div></div>
+        </div>
+
+        <button id="play-btn" onclick="startSpin()">按住拉桿 / 放開停止</button>
+        
+        <div class="qr-section">
+            <p>請掃描參加投稿：</p>
+            <div id="qrcode"></div>
+            <p><small>或是將此檔案傳給同學打開</small></p>
+            <button onclick="toggleView()" style="width: auto; padding: 5px 15px; font-size: 12px; margin-top: 10px; background: #666;">切換至學生輸入介面</button>
+        </div>
+    </div>
+
+    <div id="student-view" class="hidden">
+        <h1>填寫創意詞彙</h1>
+        <p>發揮你的想像力！</p>
+        <input type="text" id="input-who" placeholder="某人 (例如：穿睡衣的校長)">
+        <input type="text" id="input-where" placeholder="在哪裡 (例如：在玉山山頂)">
+        <input type="text" id="input-doing" placeholder="做某事 (例如：跳科目三)">
+        <button id="submit-btn" onclick="submitData()">確認上傳 (限一次)</button>
+        <p id="status-msg"></p>
+        <button onclick="toggleView()" style="width: auto; padding: 5px 15px; font-size: 12px; margin-top: 10px; background: #666;">切換回老師展示介面</button>
+    </div>
+</div>
+
+<script>
+    // === !!! 請在此處貼上你的 GAS URL !!! ===
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwb4l-YD-3eHRwpirMNljvmbGuUVsb7KVfTAQqLdCxrhZrQVIibiL9QAsMhWOo_8N6ovA/exec";
+                     
+    let allData = { who: [], where: [], doing: [] };
+    let isSpinning = false;
+    let spinInterval;
+
+    // 初始化：產生 QR Code (指向當前網頁位址)
+    new QRCode(document.getElementById("qrcode"), {
+        text: window.location.href,
+        width: 150,
+        height: 150
+    });
+
+    // 切換老師/學生畫面
+    function toggleView() {
+        document.getElementById('teacher-view').classList.toggle('hidden');
+        document.getElementById('student-view').classList.toggle('hidden');
+    }
+
+    // [學生端] 提交資料
+    function submitData() {
+        const who = document.getElementById('input-who').value;
+        const where = document.getElementById('input-where').value;
+        const doing = document.getElementById('input-doing').value;
+        const btn = document.getElementById('submit-btn');
+
+        if (!who || !where || !doing) return alert("請填滿三個框框喔！");
+        if (localStorage.getItem('submitted')) return alert("你已經參加過囉！");
+
+        btn.disabled = true;
+        btn.innerText = "傳送中...";
+
+        fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ who, where, doing })
+        }).then(() => {
+            localStorage.setItem('submitted', 'true');
+            btn.innerText = "上傳成功！";
+            document.getElementById('status-msg').innerText = "資料已飛向大螢幕，請看老師投影片！";
+        }).catch(err => {
+            alert("錯誤：" + err);
+            btn.disabled = false;
+        });
+    }
+
+    // [老師端] 每 3 秒更新人數與抓取資料
+    function updateCount() {
+        fetch(`${GAS_URL}?action=get`)
+            .then(res => res.json())
+            .then(data => {
+                allData = data;
+                document.getElementById('counter').innerText = `目前上傳人數：${data.who.length} 人`;
+            });
+    }
+    setInterval(updateCount, 5000); // 每一段時間更新一次
+    updateCount();
+
+    // [老虎機邏輯]
+    function startSpin() {
+        if (allData.who.length < 2) return alert("人數還不夠喔，至少要 2 人以上！");
+        
+        const btn = document.getElementById('play-btn');
+        if (!isSpinning) {
+            isSpinning = true;
+            btn.innerText = "停止！";
+            btn.style.background = "#e74c3c";
+            
+            spinInterval = setInterval(() => {
+                updateSlot('slot-who', allData.who);
+                updateSlot('slot-where', allData.where);
+                updateSlot('slot-doing', allData.doing);
+            }, 100);
+        } else {
+            isSpinning = false;
+            btn.innerText = "按住拉桿 / 放開停止";
+            btn.style.background = "#6c5ce7";
+            clearInterval(spinInterval);
+        }
+    }
+
+    function updateSlot(id, list) {
+        const el = document.getElementById(id);
+        const randomText = list[Math.floor(Math.random() * list.length)];
+        el.innerHTML = `<div class="slot-item">${randomText}</div>`;
+    }
+</script>
+
+</body>
+</html>
