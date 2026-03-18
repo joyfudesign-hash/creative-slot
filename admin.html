@@ -131,23 +131,29 @@
         clearInterval(spinInterval); spinInterval = null;
         clearInterval(spinTimer); spinTimer = null;
 
-        // 🔔 調整：高頻金屬撞擊聲 (Mechanical Click)
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        // 🛠️ 雙重撞擊音效：模擬金屬卡榫扣上的聲音
+        const now = audioCtx.currentTime;
         
-        // 使用高頻 (1200Hz) 模擬金屬撞擊，並在 0.08 秒內迅速消失
-        osc.type = 'triangle'; // 三角波比正弦波更有「硬物」感
-        osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
-        osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.08);
-        
-        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.08);
+        // 1. 高頻金屬片聲
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(2500, now); // 極高頻
+        osc1.frequency.exponentialRampToValueAtTime(1500, now + 0.04);
+        gain1.gain.setValueAtTime(0.15, now);
+        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+        osc1.connect(gain1); gain1.connect(audioCtx.destination);
+        osc1.start(); osc1.stop(now + 0.04);
+
+        // 2. 中頻機身悶響
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(400, now);
+        gain2.gain.setValueAtTime(0.1, now);
+        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+        osc2.connect(gain2); gain2.connect(audioCtx.destination);
+        osc2.start(); osc2.stop(now + 0.06);
 
         // 定格結果邏輯 (保持不變)
         if (allData.who.length > 0) {
