@@ -115,65 +115,53 @@
     let allData = { who: [], where: [], doing: [] };
     let usedIndices = { who: [], where: [], doing: [] };
     
-    // --- 建立內置音效 (避免外部連結失效) ---
+// --- 建立清脆撥片音效 (Slot Machine Click) ---
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let spinOsc = null;
+    let spinInterval = null;
+
+    function playClick() {
+        // 產生一個極短的清脆點擊聲
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc.type = 'sine'; // 使用正弦波，聲音較圓潤
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime); // 高頻點擊
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+        
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    }
 
     function playSpinSound() {
-        if (spinOsc) return;
-        spinOsc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        spinOsc.type = 'square'; 
-        spinOsc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        spinOsc.connect(gain);
-        gain.connect(audioCtx.destination);
-        spinOsc.start();
+        if (spinInterval) return;
+        audioCtx.resume();
+        // 每 0.1 秒響一次，模擬快速轉動的齒輪聲
+        spinInterval = setInterval(playClick, 100);
     }
 
     function stopSpinSound() {
-        if (spinOsc) {
-            spinOsc.stop();
-            spinOsc = null;
-            // 播放一聲結尾「咚」
+        if (spinInterval) {
+            clearInterval(spinInterval);
+            spinInterval = null;
+            
+            // 結尾補一個稍微重一點的「砰」
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.2);
+            osc.stop(audioCtx.currentTime + 0.3);
         }
-    }
-
-    // --- 原有邏輯 ---
-    new QRCode(document.getElementById("qrcode"), {
-        text: window.location.href.replace('admin.html', 'index.html'),
-        width: 220, height: 220
-    });
-
-    setInterval(fetchData, 3000);
-    fetchData();
-
-    function fetchData() {
-        fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
-            allData = data;
-            document.getElementById('counter').innerText = data.who.length;
-        });
-    }
-
-    function showSlotMachine() {
-        if (allData.who.length === 0) return alert("還沒有資料喔！");
-        audioCtx.resume(); // 解鎖音效環境
-        document.getElementById('wait-view').classList.add('hidden');
-        document.getElementById('slot-view').classList.remove('hidden');
-    }
-
-    function startSpinHandle() {
-        document.getElementById('handle').classList.add('active');
-        document.querySelectorAll('.slot-item').forEach(el => el.classList.add('blur-animate'));
-        playSpinSound(); // 啟動機械轉動聲
     }
 
     function getRandomUnique(category) {
