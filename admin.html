@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老師端：老虎機控制台</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root { --gold: #ffd700; --bg: #2c3e50; --card: #ecf0f1; }
+        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { background: var(--card); padding: 30px; border-radius: 20px; width: 90%; max-width: 800px; text-align: center; position: relative; }
+        .hidden { display: none !important; }
+        #counter { font-size: 80px; font-weight: bold; color: #e74c3c; margin: 20px 0; }
+        .btn-go { background: #2980b9; color: white; border: none; padding: 20px 50px; border-radius: 50px; font-size: 24px; cursor: pointer; }
+        
+        .slots { display: flex; justify-content: space-around; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 8px solid var(--gold); margin: 30px 0; height: 120px; overflow: hidden; }
+        .slot-column { width: 30%; background: white; height: 100%; border-radius: 5px; position: relative; overflow: hidden; }
+        .slot-item { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
+        
+        .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(4px); }
+        @keyframes scrollBlur { 0% { transform: translateY(0); } 100% { transform: translateY(-120px); } }
+        
+        .btn-play { background: #f1c40f; color: #2c3e50; border: none; padding: 20px; border-radius: 10px; width: 100%; font-size: 30px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="wait-view">
+        <h1>目前已收集創意碎片</h1>
+        <div id="counter">0</div>
+        <div id="qrcode" style="display: flex; justify-content: center; margin: 20px;"></div>
+        <button class="btn-go" onclick="showSlot()">準備揭曉 (GO!)</button>
+    </div>
+
+    <div id="slot-view" class="hidden">
+        <h1>隨機創意組合</h1>
+        <div class="slots">
+            <div class="slot-column"><div id="s1" class="slot-item">？</div></div>
+            <div class="slot-column"><div id="s2" class="slot-item">？</div></div>
+            <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
+        </div>
+        <button class="btn-play" onmousedown="startSpin()" onmouseup="stopSpin()" ontouchstart="startSpin()" ontouchend="stopSpin()">按住啟動拉桿</button>
+        <br><br>
+        <button onclick="location.reload()" style="font-size:12px; opacity:0.5;">重置/刷新</button>
+    </div>
+</div>
+
+<audio id="snd-spin" loop src="https://www.soundjay.com/buttons/button-20.mp3"></audio>
+<audio id="snd-stop" src="https://www.soundjay.com/buttons/button-3.mp3"></audio>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxStyEtZvcHJmQgAdKvPDtV0JqIYknU09g3dCGdF9ac4Qc9rBfv8g_KveXw4FQ_cLH91Q/exec";
+    let allData = { who: [], where: [], doing: [] };
+
+    new QRCode(document.getElementById("qrcode"), {
+        text: window.location.href.replace('admin.html', 'index.html'),
+        width: 200, height: 200
+    });
+
+    setInterval(() => {
+        fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
+            allData = data;
+            document.getElementById('counter').innerText = data.who.length;
+        });
+    }, 3000);
+
+    function showSlot() {
+        if (allData.who.length === 0) return alert("還沒有人投稿喔！");
+        document.getElementById('wait-view').classList.add('hidden');
+        document.getElementById('slot-view').classList.remove('hidden');
+    }
+
+    function startSpin() {
+        document.getElementById('s1').classList.add('blur-animate');
+        document.getElementById('s2').classList.add('blur-animate');
+        document.getElementById('s3').classList.add('blur-animate');
+        document.getElementById('snd-spin').play();
+    }
+
+    function stopSpin() {
+        document.querySelectorAll('.slot-column div').forEach(el => el.classList.remove('blur-animate'));
+        document.getElementById('snd-spin').pause();
+        document.getElementById('snd-stop').play();
+
+        document.getElementById('s1').innerText = allData.who[Math.floor(Math.random()*allData.who.length)];
+        document.getElementById('s2').innerText = allData.where[Math.floor(Math.random()*allData.where.length)];
+        document.getElementById('s3').innerText = allData.doing[Math.floor(Math.random()*allData.doing.length)];
+    }
+</script>
+</body>
+</html>
