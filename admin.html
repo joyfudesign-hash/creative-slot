@@ -1,355 +1,19 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創意思考：神祕重組老虎機</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        :root {
-            --gold: #ffd700;
-            --bg-dark: #121212;
-            --machine-body: #8b0000; /* 深紅色機身 */
-            --neon-red: #ff3131;
-            --neon-blue: #0bdfff;
-        }
-
-        body {
-            font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle, #2c3e50 0%, #121212 100%);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            color: white;
-        }
-
-        .container {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .hidden { display: none !important; }
-
-        /* --- 等待畫面 (Wait View) --- */
-        #wait-view {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 40px;
-            border-radius: 20px;
-            border: 4px solid var(--gold);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-            animation: neonPulseBlue 2s infinite alternate;
-        }
-
-        #wait-view h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 0 0 10px var(--neon-blue); }
-
-        #counter {
-            font-size: 120px;
-            font-weight: bold;
-            color: #e74c3c;
-            margin: 20px 0;
-            text-shadow: 0 0 20px #e74c3c, 0 0 40px #ff3131;
-        }
-
-        #wait-view p { font-size: 1.5rem; color: #bdc3c7; }
-
-        .btn-go {
-            background: #2980b9;
-            color: white;
-            border: none;
-            padding: 20px 60px;
-            border-radius: 50px;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px #1c5478, 0 0 20px rgba(41, 128, 185, 0.8);
-            transition: all 0.2s;
-            margin-top: 20px;
-        }
-
-        .btn-go:hover { transform: scale(1.05); box-shadow: 0 8px #1c5478, 0 0 30px rgba(41, 128, 185, 1); }
-        .btn-go:active { transform: translateY(4px); box-shadow: 0 2px #1c5478; }
-
-        /* --- 老虎機仿真畫面 (Slot View) --- */
-        #slot-view {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        /* 老虎機主體架構 */
-        .machine-wrapper {
-            position: relative;
-            display: flex;
-            align-items: flex-end; /* 讓拉桿跟主體對齊底部 */
-        }
-
-        /* 仿真機身 */
-        .slot-machine {
-            background-color: var(--machine-body);
-            width: 70vw; /* 全螢幕感 */
-            max-width: 900px;
-            height: 80vh;
-            border-radius: 30px 30px 10px 10px;
-            border: 15px solid #4a0000;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* 霓虹燈頂部標題 */
-        .machine-header {
-            width: 100%;
-            text-align: center;
-            font-size: 3rem;
-            font-weight: bold;
-            color: #fff;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red), 0 0 30px var(--neon-red);
-            margin-bottom: 20px;
-            animation: neonBlinkRed 1.5s infinite alternate;
-        }
-
-        /* 展示視窗 (Reels Viewport) */
-        .slots-viewport {
-            width: 100%;
-            flex: 1; /* 佔滿剩餘高度 */
-            background: #fff;
-            border-radius: 15px;
-            border: 10px solid var(--gold);
-            display: flex;
-            justify-content: space-around;
-            overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-            position: relative;
-        }
-
-        /* 視窗中間的紅線 (Payline) */
-        .slots-viewport::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 49, 49, 0.7);
-            box-shadow: 0 0 10px rgba(255, 49, 49, 1);
-            transform: translateY(-50%);
-            z-index: 10;
-        }
-
-        /* 轉輪單欄 */
-        .slot-column {
-            width: 32%;
-            height: 100%;
-            position: relative;
-            border-right: 2px solid #ccc;
-        }
-        .slot-column:last-child { border-right: none; }
-
-        /* 單個詞彙項目 - 字體加大 */
-        .slot-item {
-            height: 100%; /* 視窗高度 */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem; /* 超大字體 */
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-            padding: 0 15px;
-            box-sizing: border-box;
-            word-break: break-all;
-        }
-
-        /* --- 仿真拉桿 (The Handle) --- */
-        .handle-wrapper {
-            width: 80px;
-            height: 60vh;
-            margin-left: 20px;
-            position: relative;
-            cursor: pointer;
-            z-index: 20;
-        }
-
-        /* 拉桿底座 */
-        .handle-base {
-            position: absolute;
-            bottom: 50px;
-            left: 0;
-            width: 80px;
-            height: 120px;
-            background: #555;
-            border-radius: 10px;
-            box-shadow: inset 5px 5px 10px rgba(0,0,0,0.5);
-        }
-
-        /* 拉桿桿身 */
-        .handle-stick {
-            position: absolute;
-            bottom: 110px; /* 從底座上方開始 */
-            left: 30px;
-            width: 20px;
-            height: 35vh; /* 桿子長度 */
-            background: linear-gradient(to right, #bdbdbd 0%, #ffffff 50%, #bdbdbd 100%);
-            border-radius: 10px 10px 0 0;
-            transition: transform 0.2s ease-in-out;
-            transform-origin: bottom center; /* 以底部為支點旋轉 */
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-
-        /* 拉桿圓球 */
-        .handle-ball {
-            position: absolute;
-            top: -40px; /* 在桿子頂端 */
-            left: -20px;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 30% 30%, #ff5e5e 0%, #8b0000 100%);
-            border-radius: 50%;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.8), inset -5px -5px 10px rgba(0,0,0,0.5);
-            animation: neonPulseRed 1.5s infinite alternate; /* 圓球平常也會閃 */
-        }
-
-        /* 按下時的拉桿動畫 (轉軸旋轉) */
-        .handle-wrapper.active .handle-stick {
-            transform: rotateX(60deg) translateY(20px); /* 向上扳動的感覺 */
-        }
-
-        /* 按下時圓球變色 (霓虹激發) */
-        .handle-wrapper.active .handle-ball {
-            background: radial-gradient(circle at 30% 30%, #ff9999 0%, #ff3131 100%);
-            box-shadow: 0 0 30px var(--neon-red), 0 0 60px var(--neon-red);
-            animation: none; /* 停止平常的閃爍 */
-        }
-
-        /* 視窗霓虹邊框動畫 (按住拉桿時啟動) */
-        .slots-viewport.active-neon {
-            animation: neonBorderPulse 0.5s infinite alternate;
-        }
-
-        /* --- 動畫定義 (Animations) --- */
-        @keyframes neonBlinkRed {
-            0%, 100% { text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red), 0 0 30px var(--neon-red); }
-            50% { text-shadow: 0 0 5px #fff, 0 0 10px var(--neon-red), 0 0 15px var(--neon-red); opacity: 0.8; }
-        }
-
-        @keyframes neonPulseBlue {
-            0% { box-shadow: 0 0 20px rgba(11, 223, 255, 0.3); border-color: #056674; }
-            100% { box-shadow: 0 0 40px rgba(11, 223, 255, 0.8); border-color: var(--neon-blue); }
-        }
-
-        @keyframes neonPulseRed {
-            0% { box-shadow: 2px 2px 10px rgba(0,0,0,0.8), 0 0 10px rgba(255, 49, 49, 0.3); }
-            100% { box-shadow: 5px 5px 15px rgba(0,0,0,0.8), 0 0 25px rgba(255, 49, 49, 0.8); }
-        }
-
-        @keyframes neonBorderPulse {
-            0% { border-color: var(--gold); box-shadow: inset 0 0 30px rgba(0,0,0,0.8); }
-            100% { border-color: var(--neon-red); box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 30px var(--neon-red); }
-        }
-
-        /* 模糊動畫 (Spinning Effect) */
-        .blur-animate {
-            animation: scrollBlur 0.1s infinite linear;
-            filter: blur(8px); /* 加大模糊感 */
-            opacity: 0.7;
-        }
-        @keyframes scrollBlur {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-120px); } /* 配合 slot-item 高度 */
-        }
-
-        /* --- Corner Reset Button (隱藏的清空按鈕) --- */
-        #hidden-reset-btn {
-            position: fixed;
-            bottom: 5px;
-            right: 5px;
-            width: 15px;
-            height: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: none;
-            cursor: pointer;
-            z-index: 100;
-            opacity: 0.1;
-            transition: opacity 0.3s;
-        }
-        #hidden-reset-btn:hover { opacity: 1; background: rgba(231, 76, 60, 0.5); }
-
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="wait-view">
-        <h1>創意思考遊戲：期待值</h1>
-        <div id="counter">0</div>
-        <p>位同學的創意碎片已就位</p>
-        <div id="qrcode" style="display: flex; justify-content: center; margin: 25px;"></div>
-        <button class="btn-go" onclick="showSlotMachine()">解鎖權限並準備揭曉 (GO!)</button>
-    </div>
-
-    <div id="slot-view" class="hidden">
-        <div class="machine-wrapper">
-            <div class="slot-machine">
-                <div class="machine-header">CREATIVE SLOT</div>
-                <div class="slots-viewport" id="viewport">
-                    <div class="slot-column"><div id="s1" class="slot-item">？</div></div>
-                    <div class="slot-column"><div id="s2" class="slot-item">？</div></div>
-                    <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
-                </div>
-            </div>
-
-            <div class="handle-wrapper" id="handle" 
-                 onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" 
-                 ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
-                <div class="handle-base"></div>
-                <div class="handle-stick">
-                    <div class="handle-ball"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<button id="hidden-reset-btn" title="清空試算表資料 (多班切換用)" onclick="clearGoogleSheets()"></button>
-
-<audio id="snd-spin" loop preload="auto" src="https://cdn.pixabay.com/audio/2022/03/19/audio_13324838.mp3"></audio>
-<audio id="snd-stop" preload="auto" src="https://cdn.pixabay.com/audio/2022/03/15/audio_1b351167b0.mp3"></audio>
-
 <script>
-    // ⚠️ 請換成您測試成功的 GAS URL (exec 結尾)
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     
     let allData = { who: [], where: [], doing: [] };
-    let isAudioUnlocked = false; // 記錄音效是否已解鎖
+    let isAudioUnlocked = false; 
 
-    // 初始化：產生 QR Code (指向 index.html)
+    // 初始化：產生 QR Code
     new QRCode(document.getElementById("qrcode"), {
         text: window.location.href.replace('admin.html', 'index.html'),
         width: 220, height: 220,
-        correctLevel : QRCode.CorrectLevel.H // 提高容錯率
+        correctLevel : QRCode.CorrectLevel.H 
     });
 
     // 每 3 秒抓一次人數
     const fetchInterval = setInterval(fetchData, 3000);
-    fetchData(); // 立即抓一次
+    fetchData(); 
 
     function fetchData() {
         fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
@@ -358,65 +22,59 @@
         }).catch(err => console.error("抓取資料失敗:", err));
     }
 
-    // 點擊 GO! 按鈕：切換畫面並解鎖音效
     function showSlotMachine() {
         if (allData.who.length === 0) return alert("還沒有人投稿喔！無法啟動老虎機。");
         
-        // 嘗試播放一個無聲片段來解鎖瀏覽器音效權限
+        // 嘗試解鎖音效，但不管成功與否，都要進入下一頁
         const spinSnd = document.getElementById('snd-spin');
         spinSnd.play().then(() => {
-            spinSnd.pause(); // 成功解鎖後立刻暫停
+            spinSnd.pause();
             isAudioUnlocked = true;
-            console.log("音效權限已解鎖");
         }).catch(err => {
-            console.warn("音效解鎖失敗 (使用者未與頁面互動?):", err);
+            console.warn("音效解鎖失敗，將以靜音模式運行");
+            isAudioUnlocked = false; // 即使失敗也不要擋住流程
         });
 
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
     }
 
-    // --- 老虎機拉桿邏輯 (仿真動畫 + 音效 + 模糊) ---
     const handleEl = document.getElementById('handle');
     const viewportEl = document.getElementById('viewport');
     const sndSpin = document.getElementById('snd-spin');
     const sndStop = document.getElementById('snd-stop');
 
     function startSpinHandle() {
-        if (!isAudioUnlocked) return; // 未解鎖則不啟動
+        // 🚀 關鍵修正：刪除原本的 if (!isAudioUnlocked) return; 
+        // 讓拉桿一定可以按！
 
-        // 1. 啟動拉桿按下動畫
         handleEl.classList.add('active');
-        // 2. 啟動機身霓虹燈閃爍
         viewportEl.classList.add('active-neon');
         
-        // 3. 啟動轉輪模糊動畫
         document.getElementById('s1').classList.add('blur-animate');
         document.getElementById('s2').classList.add('blur-animate');
         document.getElementById('s3').classList.add('blur-animate');
         
-        // 4. 播放轉動音效 (確保回到開頭)
-        sndSpin.currentTime = 0;
-        sndSpin.play();
+        // 只有在權限允許時才播音效，失敗就靜音轉動
+        if (isAudioUnlocked) {
+            sndSpin.currentTime = 0;
+            sndSpin.play().catch(()=>{});
+        }
     }
 
     function stopSpinHandle() {
-        if (!isAudioUnlocked) return;
-
-        // 1. 恢復拉桿動畫
         handleEl.classList.remove('active');
-        // 2. 停止機身霓虹燈閃爍
         viewportEl.classList.remove('active-neon');
 
-        // 3. 停止模糊動畫
         document.querySelectorAll('.slot-column div').forEach(el => el.classList.remove('blur-animate'));
         
-        // 4. 停止轉動音效，播放停止音效
-        sndSpin.pause();
-        sndStop.currentTime = 0; // 確保每次停止聲都完整
-        sndStop.play();
+        if (isAudioUnlocked) {
+            sndSpin.pause();
+            sndStop.currentTime = 0;
+            sndStop.play().catch(()=>{});
+        }
 
-        // 5. 隨機選取結果並加大字體顯示
+        // 隨機選取結果
         if (allData.who.length > 0) {
             document.getElementById('s1').innerText = allData.who[Math.floor(Math.random()*allData.who.length)];
             document.getElementById('s2').innerText = allData.where[Math.floor(Math.random()*allData.where.length)];
@@ -424,37 +82,16 @@
         }
     }
 
-    // --- 多班切換：一鍵清空 Google Sheets 資料 ---
     function clearGoogleSheets() {
-        const password = prompt("請輸入管理密碼以清空試算表資料 (預設為 1234):");
-        if (password !== "1234") { // 您可以在這裡修改密碼
-            if (password !== null) alert("密碼錯誤，拒絕清空。");
-            return;
-        }
+        const password = prompt("請輸入管理密碼以清空試算表資料:");
+        if (password !== "1234") return;
+        if(!confirm("確定要清空嗎？")) return;
 
-        if(!confirm("確定要【永久清空】試算表中所有同學投遞的詞彙嗎？此操作不可還原，適合切換班級使用。")) return;
-
-        // 在按鈕上顯示狀態
-        const resetBtn = document.getElementById('hidden-reset-btn');
-        resetBtn.style.background = "red";
-        resetBtn.style.opacity = "1";
-
-        // 發送 action=clear 到 GAS
         fetch(GAS_URL + "?action=clear").then(res => res.text()).then(txt => {
             if (txt === "Success") {
-                alert("試算表資料已清空！人數將歸零。");
-                fetchData(); // 立即刷新人數
-            } else {
-                alert("清空失敗，Google 端回報錯誤。");
+                alert("已清空！");
+                fetchData();
             }
-        }).catch(err => {
-            alert("連線失敗，無法清空資料。請檢查網路或 GAS 設定。");
-            console.error(err);
-        }).finally(() => {
-            resetBtn.style.background = ""; // 恢復原狀
-            resetBtn.style.opacity = "0.1";
         });
     }
 </script>
-</body>
-</html>
