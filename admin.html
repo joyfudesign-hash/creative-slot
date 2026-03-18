@@ -131,14 +131,25 @@
         clearInterval(spinInterval); spinInterval = null;
         clearInterval(spinTimer); spinTimer = null;
 
-        // 結尾音
-        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+        // 🔔 調整：高頻金屬撞擊聲 (Mechanical Click)
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        // 使用高頻 (1200Hz) 模擬金屬撞擊，並在 0.08 秒內迅速消失
+        osc.type = 'triangle'; // 三角波比正弦波更有「硬物」感
+        osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
+        osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.08);
+        
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
 
-        // 定格結果 (不重複邏輯)
+        // 定格結果邏輯 (保持不變)
         if (allData.who.length > 0) {
             ['who','where','doing'].forEach((cat, i) => {
                 if (!usedIndices[cat] || usedIndices[cat].length >= allData[cat].length) usedIndices[cat] = [];
