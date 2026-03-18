@@ -86,8 +86,8 @@
 <audio id="snd-spin" loop src="https://www.soundjay.com/buttons/button-20.mp3"></audio>
 <audio id="snd-stop" src="https://www.soundjay.com/buttons/button-3.mp3"></audio>
 
-<script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwb4l-YD-3eHRwpirMNljvmbGuUVsb7KVfTAQqLdCxrhZrQVIibiL9QAsMhWOo_8N6ovA/exec"; // 請替換成你的 URL
+<script>             
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby6Td-mUZU5RFwlyL-A7H2EYXzKGFYDXRneaDljo5kbDYhhLdIDttrH64Lmx1jMdwI5LA/exec"; // 請替換成你的 URL
     let allData = { who: [], where: [], doing: [] };
     const urlParams = new URLSearchParams(window.location.search);
     const isAdmin = urlParams.get('mode') === 'admin';
@@ -111,19 +111,32 @@
     }
 
     function submitData() {
-        const who = document.getElementById('input-who').value;
-        const where = document.getElementById('input-where').value;
-        const doing = document.getElementById('input-doing').value;
-        if (!who || !where || !doing) return alert("還沒填完喔！");
-        if (localStorage.getItem('submitted')) return alert("你已經完成任務了！");
+    const who = document.getElementById('input-who').value;
+    const where = document.getElementById('input-where').value;
+    const doing = document.getElementById('input-doing').value;
+    const btn = document.getElementById('submit-btn');
 
-        document.getElementById('submit-btn').disabled = true;
-        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ who, where, doing }) })
-        .then(() => {
-            localStorage.setItem('submitted', 'true');
-            document.getElementById('status-msg').innerText = "上傳成功！請等待老師揭曉。";
-        });
-    }
+    if (!who || !where || !doing) return alert("還沒填完喔！");
+    if (localStorage.getItem('submitted')) return alert("你已經完成任務了！");
+
+    btn.disabled = true;
+    btn.innerText = "傳送中...";
+
+    // 確保這裡的 GAS_URL 是你最新部署的那一串
+    fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors', // 加入這行可以強制發送，繞過部分瀏覽器限制
+        body: JSON.stringify({ who, where, doing })
+    }).then(() => {
+        localStorage.setItem('submitted', 'true');
+        btn.innerText = "上傳成功！";
+        document.getElementById('status-msg').innerText = "上傳成功！請等待老師揭曉。";
+    }).catch(err => {
+        console.error(err);
+        alert("上傳失敗，請檢查網路或 URL");
+        btn.disabled = false;
+    });
+}
 
     function goToSlot() {
         if (allData.who.length < 1) return alert("還沒有人投稿喔！");
