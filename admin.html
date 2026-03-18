@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創意思考：神祕重組老虎機 (進階版)</title>
+    <title>創意思考：神祕重組老虎機 (音效強化版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
@@ -29,6 +29,7 @@
         .container { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         .hidden { display: none !important; }
 
+        /* --- 等待畫面 --- */
         #wait-view {
             text-align: center; background: rgba(0, 0, 0, 0.8); padding: 40px; border-radius: 20px;
             border: 4px solid var(--gold); box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
@@ -41,6 +42,7 @@
             font-size: 28px; font-weight: bold; cursor: pointer; box-shadow: 0 5px #1c5478; transition: all 0.2s;
         }
 
+        /* --- 老虎機畫面 --- */
         #slot-view { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
         .machine-wrapper { position: relative; display: flex; align-items: flex-end; }
         .slot-machine {
@@ -59,147 +61,6 @@
         .slot-column:last-child { border-right: none; }
         .slot-item { font-size: 4rem; font-weight: bold; color: #333; text-align: center; }
 
+        /* --- 拉桿 --- */
         .handle-wrapper { width: 80px; height: 60vh; margin-left: 20px; position: relative; cursor: pointer; }
-        .handle-base { position: absolute; bottom: 50px; width: 80px; height: 120px; background: #555; border-radius: 10px; }
-        .handle-stick {
-            position: absolute; bottom: 110px; left: 30px; width: 20px; height: 35vh;
-            background: linear-gradient(to right, #bdbdbd, #ffffff, #bdbdbd); transform-origin: bottom center; transition: transform 0.2s;
-        }
-        .handle-ball { position: absolute; top: -40px; left: -20px; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, #ff5e5e, #8b0000); border-radius: 50%; }
-        .handle-wrapper.active .handle-stick { transform: rotateX(60deg) translateY(20px); }
-
-        .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(8px); opacity: 0.7; }
-        @keyframes scrollBlur { 0% { transform: translateY(0); } 100% { transform: translateY(-20px); } }
-
-        #hidden-reset-btn { position: fixed; bottom: 5px; right: 5px; width: 20px; height: 20px; opacity: 0.1; cursor: pointer; border: none; background: transparent; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div id="wait-view">
-        <h1>創意思考：期待值</h1>
-        <div id="counter">0</div>
-        <p>位同學的創意碎片已就位</p>
-        <div id="qrcode" style="display: flex; justify-content: center; margin: 25px;"></div>
-        <button class="btn-go" onclick="showSlotMachine()">解鎖並啟動 (GO!)</button>
-    </div>
-
-    <div id="slot-view" class="hidden">
-        <div class="machine-wrapper">
-            <div class="slot-machine">
-                <div class="machine-header">CREATIVE SLOT</div>
-                <div class="slots-viewport" id="viewport">
-                    <div class="slot-column"><div id="s1" class="slot-item">？</div></div>
-                    <div class="slot-column"><div id="s2" class="slot-item">？</div></div>
-                    <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
-                </div>
-            </div>
-            <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()">
-                <div class="handle-base"></div>
-                <div class="handle-stick"><div class="handle-ball"></div></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<button id="hidden-reset-btn" onclick="clearGoogleSheets()"></button>
-
-<!-- 使用 Google Actions 音效庫，更穩定 -->
-<audio id="snd-spin" loop src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
-<audio id="snd-stop" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
-
-<script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
-    
-    let allData = { who: [], where: [], doing: [] };
-    let usedIndices = { who: [], where: [], doing: [] };
-    
-// --- 建立清脆撥片音效 (Slot Machine Click) ---
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let spinInterval = null;
-
-    function playClick() {
-        // 產生一個極短的清脆點擊聲
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.type = 'sine'; // 使用正弦波，聲音較圓潤
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime); // 高頻點擊
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-        
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.05);
-    }
-
-    function playSpinSound() {
-        if (spinInterval) return;
-        audioCtx.resume();
-        // 每 0.1 秒響一次，模擬快速轉動的齒輪聲
-        spinInterval = setInterval(playClick, 100);
-    }
-
-    function stopSpinSound() {
-        if (spinInterval) {
-            clearInterval(spinInterval);
-            spinInterval = null;
-            
-            // 結尾補一個稍微重一點的「砰」
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.3);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        }
-    }
-
-    function getRandomUnique(category) {
-        const pool = allData[category];
-        const used = usedIndices[category];
-        let available = pool.map((_, i) => i).filter(i => !used.includes(i));
-        if (available.length === 0) {
-            usedIndices[category] = [];
-            available = pool.map((_, i) => i);
-        }
-        const chosenIndex = available[Math.floor(Math.random() * available.length)];
-        usedIndices[category].push(chosenIndex);
-        return pool[chosenIndex];
-    }
-
-    function stopSpinHandle() {
-        document.getElementById('handle').classList.remove('active');
-        document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
-        
-        stopSpinSound(); // 停止聲音
-
-        if (allData.who.length > 0) {
-            document.getElementById('s1').innerText = getRandomUnique('who');
-            document.getElementById('s2').innerText = getRandomUnique('where');
-            document.getElementById('s3').innerText = getRandomUnique('doing');
-        }
-    }
-
-    function clearGoogleSheets() {
-        const password = prompt("管理密碼 (1234):");
-        if (password === "1234" && confirm("確定清空？")) {
-            fetch(GAS_URL + "?action=clear").then(() => {
-                usedIndices = { who: [], where: [], doing: [] };
-                fetchData();
-                alert("已清空！");
-            });
-        }
-    }
-</script>
-</body>
-</html>
+        .handle-base { position: absolute; bottom: 50px; width: 80px; height: 120px; background: #55
