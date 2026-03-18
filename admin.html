@@ -3,54 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創意思考：神祕重組老虎機 (最終完美版)</title>
+    <title>創意思考老虎機 (專業安靜版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --gold: #ffd700; --bg: #121212; --red: #8b0000; }
         body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; color: white; }
         .container { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .hidden { display: none !important; }
-        
-        /* 等待畫面 */
-        #wait-view { text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 20px; border: 4px solid var(--gold); box-shadow: 0 0 20px rgba(255,215,0,0.3); }
-        #counter { font-size: 100px; font-weight: bold; color: #e74c3c; margin: 10px; text-shadow: 0 0 15px #e74c3c; }
-        .btn-go { background: #2980b9; color: white; border: none; padding: 15px 50px; border-radius: 50px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 5px #1c5478; }
-        
-        /* 老虎機本體 */
+        #wait-view { text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 20px; border: 4px solid var(--gold); }
+        #counter { font-size: 100px; font-weight: bold; color: #e74c3c; margin: 10px; }
+        .btn-go { background: #2980b9; color: white; border: none; padding: 15px 50px; border-radius: 50px; font-size: 24px; cursor: pointer; font-weight: bold; }
         #slot-view { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
         .slot-machine { background: var(--red); width: 85vw; max-width: 850px; height: 75vh; border-radius: 30px; border: 12px solid #4a0000; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; }
         .slots-viewport { width: 100%; flex: 1; background: #fff; border-radius: 15px; border: 8px solid var(--gold); display: flex; overflow: hidden; position: relative; }
-        .slot-column { width: 33.33%; display: flex; align-items: center; justify-content: center; border-right: 2px solid #eee; position: relative; }
+        .slot-column { width: 33.33%; display: flex; align-items: center; justify-content: center; border-right: 2px solid #eee; }
         .slot-item { font-size: 3.5rem; font-weight: bold; color: #333; text-align: center; width: 90%; word-break: break-all; }
-        
-        /* 拉桿動畫 */
         .handle-wrapper { width: 70px; height: 50vh; margin-left: 25px; position: relative; cursor: pointer; }
         .handle-stick { position: absolute; bottom: 80px; left: 25px; width: 20px; height: 35vh; background: linear-gradient(to right, #bdbdbd, #fff, #bdbdbd); transform-origin: bottom center; transition: 0.2s; border-radius: 10px; }
         .handle-ball { position: absolute; top: -45px; left: -20px; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, #ff5e5e, #8b0000); border-radius: 50%; }
         .handle-wrapper.active .handle-stick { transform: rotateX(60deg) translateY(20px); }
-
-        /* 自然模糊捲動效果 */
         .blur-animate { animation: scrollBlur 0.12s infinite linear; filter: blur(6px); opacity: 0.5; }
-        @keyframes scrollBlur { 
-            0% { transform: translateY(-40px); } 
-            50% { transform: translateY(0px); }
-            100% { transform: translateY(40px); } 
-        }
+        @keyframes scrollBlur { 0% { transform: translateY(-40px); } 50% { transform: translateY(0px); } 100% { transform: translateY(40px); } }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <!-- 等待畫面 -->
     <div id="wait-view">
         <h1 style="margin-top:0;">創意碎片期待值</h1>
         <div id="counter">0</div>
-        <p style="font-size:1.2rem;">位同學的靈感已就位</p>
         <div id="qrcode" style="display:flex; justify-content:center; margin:20px;"></div>
         <button class="btn-go" onclick="showSlotMachine()">解鎖並啟動 (GO!)</button>
     </div>
-
-    <!-- 老虎機畫面 -->
     <div id="slot-view" class="hidden">
         <div style="display: flex; align-items: flex-end;">
             <div class="slot-machine">
@@ -61,7 +44,6 @@
                     <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
                 </div>
             </div>
-            <!-- 拉桿 -->
             <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
                 <div style="position:absolute; bottom:40px; width:70px; height:100px; background:#444; border-radius:10px;"></div>
                 <div class="handle-stick"><div class="handle-ball"></div></div>
@@ -69,93 +51,50 @@
         </div>
     </div>
 </div>
-
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     let allData = { who: [], where: [], doing: [] }, usedIndices = { who: [], where: [], doing: [] };
     let spinInterval = null, spinTimer = null;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    // 音效
     function playTick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.type = 'sine'; // 使用正弦波，聲音比較圓潤但有力
-        osc.frequency.setValueAtTime(800, audioCtx.currentTime); // 從高頻開始
-        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05); // 快速降到低頻，模擬敲擊聲
-        
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.05);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    // 切換畫面
     function showSlotMachine() {
-        if (allData.who.length === 0) return alert("還沒有同學傳送資料喔！");
+        if (allData.who.length === 0) return alert("還沒有資料喔！");
         audioCtx.resume();
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
     }
 
-    // 開始轉動
     function startSpinHandle() {
         document.getElementById('handle').classList.add('active');
         const items = document.querySelectorAll('.slot-item');
         items.forEach(el => el.classList.add('blur-animate'));
-        
         if (!spinInterval) spinInterval = setInterval(playTick, 100);
         if (!spinTimer) {
             spinTimer = setInterval(() => {
                 items.forEach((el, i) => {
                     const cat = ['who', 'where', 'doing'][i];
-                    if (allData[cat].length > 0) {
-                        el.innerText = allData[cat][Math.floor(Math.random() * allData[cat].length)];
-                    }
+                    if (allData[cat].length > 0) el.innerText = allData[cat][Math.floor(Math.random() * allData[cat].length)];
                 });
             }, 60);
         }
     }
 
-    // 停止轉動
     function stopSpinHandle() {
         document.getElementById('handle').classList.remove('active');
         document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
-        
         clearInterval(spinInterval); spinInterval = null;
         clearInterval(spinTimer); spinTimer = null;
-
-        // 🛠️ 雙重撞擊音效：模擬金屬卡榫扣上的聲音
-        const now = audioCtx.currentTime;
-        
-        // 1. 高頻金屬片聲
-        const osc1 = audioCtx.createOscillator();
-        const gain1 = audioCtx.createGain();
-        osc1.type = 'triangle';
-        osc1.frequency.setValueAtTime(2500, now); // 極高頻
-        osc1.frequency.exponentialRampToValueAtTime(1500, now + 0.04);
-        gain1.gain.setValueAtTime(0.15, now);
-        gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-        osc1.connect(gain1); gain1.connect(audioCtx.destination);
-        osc1.start(); osc1.stop(now + 0.04);
-
-        // 2. 中頻機身悶響
-        const osc2 = audioCtx.createOscillator();
-        const gain2 = audioCtx.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(400, now);
-        gain2.gain.setValueAtTime(0.1, now);
-        gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
-        osc2.connect(gain2); gain2.connect(audioCtx.destination);
-        osc2.start(); osc2.stop(now + 0.06);
-
-        // 定格結果邏輯 (保持不變)
         if (allData.who.length > 0) {
             ['who','where','doing'].forEach((cat, i) => {
                 if (!usedIndices[cat] || usedIndices[cat].length >= allData[cat].length) usedIndices[cat] = [];
@@ -167,20 +106,9 @@
         }
     }
 
-    // 初始化與抓取
-    new QRCode(document.getElementById("qrcode"), { 
-        text: window.location.href.replace('admin.html', 'index.html'), 
-        width: 180, height: 180 
-    });
-
-    function fetchData() {
-        fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
-            allData = data;
-            document.getElementById('counter').innerText = data.who.length;
-        });
-    }
-    setInterval(fetchData, 3000);
-    fetchData();
+    new QRCode(document.getElementById("qrcode"), { text: window.location.href.replace('admin.html', 'index.html'), width: 180, height: 180 });
+    function fetchData() { fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => { allData = data; document.getElementById('counter').innerText = data.who.length; }); }
+    setInterval(fetchData, 3000); fetchData();
 </script>
 </body>
 </html>
