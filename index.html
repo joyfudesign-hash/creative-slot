@@ -3,57 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學生端：詞彙投稿</title>
+    <title>填寫詞彙</title>
     <style>
         body { font-family: "Microsoft JhengHei", sans-serif; background: #2c3e50; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: #ecf0f1; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #bdc3c7; border-radius: 10px; font-size: 18px; box-sizing: border-box; }
-        .btn-submit { background: #27ae60; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 20px; cursor: pointer; }
-        #status-msg { margin-top: 15px; font-weight: bold; color: #27ae60; }
+        .container { background: #ecf0f1; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        h2 { color: #2c3e50; font-size: 22px; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #bdc3c7; border-radius: 10px; font-size: 18px; box-sizing: border-box; transition: border 0.3s; }
+        input:focus { border-color: #27ae60; outline: none; }
+        .btn-submit { background: #27ae60; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 20px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-submit:disabled { background: #bdc3c7; cursor: not-allowed; }
+        #status-msg { margin-top: 15px; font-weight: bold; color: #27ae60; min-height: 24px; font-size: 14px; }
+        .char-hint { font-size: 11px; color: #95a5a6; text-align: right; display: block; margin-top: -5px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>創意思考挑戰</h1>
-    <p>請輸入詞彙，保持神祕...</p>
-    <input type="text" id="input-who" placeholder="某人 (主詞)">
-    <input type="text" id="input-where" placeholder="在哪裡 (地點)">
-    <input type="text" id="input-doing" placeholder="做某事 (動詞)">
+    <h2>請輸入詞彙</h2>
+    
+    <input type="text" id="input-who" placeholder="某人 / 某物" maxlength="8">
+    <span class="char-hint">限 8 字</span>
+    
+    <input type="text" id="input-where" placeholder="在哪裡 / 什麼情境" maxlength="8">
+    <span class="char-hint">限 8 字</span>
+    
+    <input type="text" id="input-doing" placeholder="做什麼 / 怎麼了" maxlength="8">
+    <span class="char-hint">限 8 字</span>
+    
     <button class="btn-submit" id="submit-btn" onclick="submitData()">確認上傳</button>
     <p id="status-msg"></p>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwt7XFZfoNBNMbkzPEY67rJEoAtHUmuvFJTD0xh7oe8HYCyl_grxAIxPDq_UX9c-Mo4Uw/exec";
+    // ⚠️ 老師！請記得在此處貼上您最新部署的 GAS URL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
 
     function submitData() {
-        const who = document.getElementById('input-who').value;
-        const where = document.getElementById('input-where').value;
-        const doing = document.getElementById('input-doing').value;
+        const who = document.getElementById('input-who').value.trim();
+        const where = document.getElementById('input-where').value.trim();
+        const doing = document.getElementById('input-doing').value.trim();
         const btn = document.getElementById('submit-btn');
+        const msg = document.getElementById('status-msg');
 
-        if (!who || !where || !doing) return alert("還沒填完喔！");
-        if (localStorage.getItem('submitted')) return alert("你已經完成任務了！");
-
-        btn.disabled = true;
-        btn.innerText = "傳送中...";
-
-        fetch(GAS_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ who: who, where: where, doing: doing })
-        })
-        .then(() => {
-            localStorage.setItem('submitted', 'true');
-            btn.innerText = "上傳成功！";
-            btn.style.background = "#bdc3c7";
-            document.getElementById('status-msg').innerText = "上傳成功！請等待老師揭曉。";
-        })
-        .catch(() => {
-            alert("連線異常，請檢查網路。");
-            btn.disabled = false;
-        });
-    }
-</script>
-</body>
-</html>
+        if (!who || !where || !doing) return alert("三個格子都要
