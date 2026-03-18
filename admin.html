@@ -1,97 +1,156 @@
-<script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
-    
-    let allData = { who: [], where: [], doing: [] };
-    let isAudioUnlocked = false; 
-
-    // 初始化：產生 QR Code
-    new QRCode(document.getElementById("qrcode"), {
-        text: window.location.href.replace('admin.html', 'index.html'),
-        width: 220, height: 220,
-        correctLevel : QRCode.CorrectLevel.H 
-    });
-
-    // 每 3 秒抓一次人數
-    const fetchInterval = setInterval(fetchData, 3000);
-    fetchData(); 
-
-    function fetchData() {
-        fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
-            allData = data;
-            document.getElementById('counter').innerText = data.who.length;
-        }).catch(err => console.error("抓取資料失敗:", err));
-    }
-
-    function showSlotMachine() {
-        if (allData.who.length === 0) return alert("還沒有人投稿喔！無法啟動老虎機。");
-        
-        // 嘗試解鎖音效，但不管成功與否，都要進入下一頁
-        const spinSnd = document.getElementById('snd-spin');
-        spinSnd.play().then(() => {
-            spinSnd.pause();
-            isAudioUnlocked = true;
-        }).catch(err => {
-            console.warn("音效解鎖失敗，將以靜音模式運行");
-            isAudioUnlocked = false; // 即使失敗也不要擋住流程
-        });
-
-        document.getElementById('wait-view').classList.add('hidden');
-        document.getElementById('slot-view').classList.remove('hidden');
-    }
-
-    const handleEl = document.getElementById('handle');
-    const viewportEl = document.getElementById('viewport');
-    const sndSpin = document.getElementById('snd-spin');
-    const sndStop = document.getElementById('snd-stop');
-
-    function startSpinHandle() {
-        // 🚀 關鍵修正：刪除原本的 if (!isAudioUnlocked) return; 
-        // 讓拉桿一定可以按！
-
-        handleEl.classList.add('active');
-        viewportEl.classList.add('active-neon');
-        
-        document.getElementById('s1').classList.add('blur-animate');
-        document.getElementById('s2').classList.add('blur-animate');
-        document.getElementById('s3').classList.add('blur-animate');
-        
-        // 只有在權限允許時才播音效，失敗就靜音轉動
-        if (isAudioUnlocked) {
-            sndSpin.currentTime = 0;
-            sndSpin.play().catch(()=>{});
-        }
-    }
-
-    function stopSpinHandle() {
-        handleEl.classList.remove('active');
-        viewportEl.classList.remove('active-neon');
-
-        document.querySelectorAll('.slot-column div').forEach(el => el.classList.remove('blur-animate'));
-        
-        if (isAudioUnlocked) {
-            sndSpin.pause();
-            sndStop.currentTime = 0;
-            sndStop.play().catch(()=>{});
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創意思考：神祕重組老虎機</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --bg-dark: #121212;
+            --machine-body: #8b0000;
+            --neon-red: #ff3131;
+            --neon-blue: #0bdfff;
         }
 
-        // 隨機選取結果
-        if (allData.who.length > 0) {
-            document.getElementById('s1').innerText = allData.who[Math.floor(Math.random()*allData.who.length)];
-            document.getElementById('s2').innerText = allData.where[Math.floor(Math.random()*allData.where.length)];
-            document.getElementById('s3').innerText = allData.doing[Math.floor(Math.random()*allData.doing.length)];
+        body {
+            font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle, #2c3e50 0%, #121212 100%);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
         }
-    }
 
-    function clearGoogleSheets() {
-        const password = prompt("請輸入管理密碼以清空試算表資料:");
-        if (password !== "1234") return;
-        if(!confirm("確定要清空嗎？")) return;
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
 
-        fetch(GAS_URL + "?action=clear").then(res => res.text()).then(txt => {
-            if (txt === "Success") {
-                alert("已清空！");
-                fetchData();
-            }
-        });
-    }
-</script>
+        .hidden { display: none !important; }
+
+        /* --- 等待畫面 --- */
+        #wait-view {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 4px solid var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        #counter {
+            font-size: 120px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 20px 0;
+            text-shadow: 0 0 20px #e74c3c, 0 0 40px #ff3131;
+        }
+
+        .btn-go {
+            background: #2980b9;
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            border-radius: 50px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px #1c5478;
+            transition: all 0.2s;
+        }
+
+        .btn-go:active { transform: translateY(4px); box-shadow: 0 2px #1c5478; }
+
+        /* --- 老虎機畫面 --- */
+        #slot-view {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .machine-wrapper {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .slot-machine {
+            background-color: var(--machine-body);
+            width: 70vw;
+            max-width: 900px;
+            height: 80vh;
+            border-radius: 30px 30px 10px 10px;
+            border: 15px solid #4a0000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .machine-header {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red);
+            margin-bottom: 20px;
+        }
+
+        .slots-viewport {
+            width: 100%;
+            flex: 1;
+            background: #fff;
+            border-radius: 15px;
+            border: 10px solid var(--gold);
+            display: flex;
+            justify-content: space-around;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slots-viewport::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 0; width: 100%; height: 4px;
+            background: rgba(255, 49, 49, 0.7);
+            z-index: 10;
+        }
+
+        .slot-column { width: 32%; height: 100%; border-right: 2px solid #ccc; }
+        .slot-column:last-child { border-right: none; }
+
+        .slot-item {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        /* --- 拉桿樣式 --- */
+        .handle-wrapper { width: 80px; height: 60vh; margin-left: 20px; position: relative; cursor: pointer; }
+        .handle-base { position: absolute; bottom: 50px; width: 80px; height: 120px; background: #555; border-radius: 10px; }
+        .handle-stick {
+            position: absolute; bottom: 110px; left: 30px; width: 20px; height: 35vh;
+            background: linear-gradient(to right, #bdbdbd, #ffffff, #bdbdbd);
+            transform-origin: bottom center;
+            transition: transform 0.2s;
+        }
+        .handle-ball {
+            position: absolute; top: -40px; left: -20px; width: 60px; height: 60px;
+            background: radial-gradient(circle at 30%
