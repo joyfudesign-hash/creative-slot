@@ -106,16 +106,48 @@
 <button id="hidden-reset-btn" onclick="clearGoogleSheets()"></button>
 
 <!-- 使用 Google Actions 音效庫，更穩定 -->
-<audio id="snd-spin" loop src="https://actions.google.com/sounds/v1/science_fiction/glitch_low_power_loop.ogg"></audio>
-<audio id="snd-stop" src="https://actions.google.com/sounds/v1/foley/door_slam.ogg"></audio>
+<audio id="snd-spin" loop src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
+<audio id="snd-stop" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA="></audio>
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     
     let allData = { who: [], where: [], doing: [] };
     let usedIndices = { who: [], where: [], doing: [] };
-    let isAudioUnlocked = false;
+    
+    // --- 建立內置音效 (避免外部連結失效) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let spinOsc = null;
 
+    function playSpinSound() {
+        if (spinOsc) return;
+        spinOsc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        spinOsc.type = 'square'; 
+        spinOsc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        spinOsc.connect(gain);
+        gain.connect(audioCtx.destination);
+        spinOsc.start();
+    }
+
+    function stopSpinSound() {
+        if (spinOsc) {
+            spinOsc.stop();
+            spinOsc = null;
+            // 播放一聲結尾「咚」
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+        }
+    }
+
+    // --- 原有邏輯 ---
     new QRCode(document.getElementById("qrcode"), {
         text: window.location.href.replace('admin.html', 'index.html'),
         width: 220, height: 220
@@ -133,25 +165,7 @@
 
     function showSlotMachine() {
         if (allData.who.length === 0) return alert("還沒有資料喔！");
-        
-        // 🚀 強制解鎖音效：使用者點擊 GO 的瞬間，同時解除靜音並預熱
-        const spinSnd = document.getElementById('snd-spin');
-        const stopSnd = document.getElementById('snd-stop');
-        
-        // 解除靜音鎖
-        spinSnd.muted = false;
-        stopSnd.muted = false;
-
-        // 嘗試播放一瞬間後立刻暫停，這是為了騙過瀏覽器的安全機制
-        spinSnd.play().then(() => {
-            spinSnd.pause();
-            isAudioUnlocked = true;
-            console.log("音效鎖已成功解鎖！");
-        }).catch(err => {
-            console.log("解鎖失敗，請確認是否有點擊網頁:", err);
-            isAudioUnlocked = false;
-        });
-
+        audioCtx.resume(); // 解鎖音效環境
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
     }
@@ -159,24 +173,16 @@
     function startSpinHandle() {
         document.getElementById('handle').classList.add('active');
         document.querySelectorAll('.slot-item').forEach(el => el.classList.add('blur-animate'));
-        
-        if (isAudioUnlocked) {
-            const spinSnd = document.getElementById('snd-spin');
-            spinSnd.currentTime = 0;
-            spinSnd.play().catch(e => console.log("播放失敗:", e));
-        }
+        playSpinSound(); // 啟動機械轉動聲
     }
 
     function getRandomUnique(category) {
         const pool = allData[category];
         const used = usedIndices[category];
-        let available = [];
-        for (let i = 0; i < pool.length; i++) {
-            if (!used.includes(i)) available.push(i);
-        }
+        let available = pool.map((_, i) => i).filter(i => !used.includes(i));
         if (available.length === 0) {
             usedIndices[category] = [];
-            for (let i = 0; i < pool.length; i++) available.push(i);
+            available = pool.map((_, i) => i);
         }
         const chosenIndex = available[Math.floor(Math.random() * available.length)];
         usedIndices[category].push(chosenIndex);
@@ -187,14 +193,7 @@
         document.getElementById('handle').classList.remove('active');
         document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
         
-        const spinSnd = document.getElementById('snd-spin');
-        const stopSnd = document.getElementById('snd-stop');
-
-        if (isAudioUnlocked) {
-            spinSnd.pause();
-            stopSnd.currentTime = 0;
-            stopSnd.play().catch(e => console.log("停止音效失敗:", e));
-        }
+        stopSpinSound(); // 停止聲音
 
         if (allData.who.length > 0) {
             document.getElementById('s1').innerText = getRandomUnique('who');
@@ -205,7 +204,7 @@
 
     function clearGoogleSheets() {
         const password = prompt("管理密碼 (1234):");
-        if (password === "1234" && confirm("確定要清空所有資料嗎？")) {
+        if (password === "1234" && confirm("確定清空？")) {
             fetch(GAS_URL + "?action=clear").then(() => {
                 usedIndices = { who: [], where: [], doing: [] };
                 fetchData();
