@@ -110,33 +110,42 @@
         });
     }
 
+    // [學生端] 提交資料的保險版本
     function submitData() {
-    const who = document.getElementById('input-who').value;
-    const where = document.getElementById('input-where').value;
-    const doing = document.getElementById('input-doing').value;
-    const btn = document.getElementById('submit-btn');
+        const who = document.getElementById('input-who').value;
+        const where = document.getElementById('input-where').value;
+        const doing = document.getElementById('input-doing').value;
+        const btn = document.getElementById('submit-btn');
 
-    if (!who || !where || !doing) return alert("還沒填完喔！");
-    if (localStorage.getItem('submitted')) return alert("你已經完成任務了！");
+        if (!who || !where || !doing) return alert("還沒填滿三個框框喔！");
+        if (localStorage.getItem('submitted')) return alert("你已經完成任務了！");
 
-    btn.disabled = true;
-    btn.innerText = "傳送中...";
+        btn.disabled = true;
+        btn.innerText = "傳送中...";
 
-    // 確保這裡的 GAS_URL 是你最新部署的那一串
-    fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors', // 加入這行可以強制發送，繞過部分瀏覽器限制
-        body: JSON.stringify({ who, where, doing })
-    }).then(() => {
-        localStorage.setItem('submitted', 'true');
-        btn.innerText = "上傳成功！";
-        document.getElementById('status-msg').innerText = "上傳成功！請等待老師揭曉。";
-    }).catch(err => {
-        console.error(err);
-        alert("上傳失敗，請檢查網路或 URL");
-        btn.disabled = false;
-    });
-}
+        // 使用 fetch 發送資料到 Google Sheets
+        fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'no-cors', // 繞過瀏覽器跨網域限制的關鍵
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ who: who, where: where, doing: doing })
+        })
+        .then(() => {
+            // 在 no-cors 模式下，即使成功，瀏覽器也拿不到正確回應，所以我們直接當作成功
+            localStorage.setItem('submitted', 'true');
+            btn.innerText = "上傳成功！";
+            btn.style.background = "#bdc3c7"; // 變成灰色代表已完成
+            document.getElementById('status-msg').innerText = "上傳成功！請等待老師揭曉。";
+            console.log("資料已發送，請檢查試算表。");
+        })
+        .catch((err) => {
+            console.error("發生錯誤:", err);
+            alert("連線似乎有點問題，請檢查網路或 URL 是否正確。");
+            btn.disabled = false;
+            btn.innerText = "重新上傳";
+        });
+    }
 
     function goToSlot() {
         if (allData.who.length < 1) return alert("還沒有人投稿喔！");
