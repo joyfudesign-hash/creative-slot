@@ -91,7 +91,7 @@
     transform-origin: bottom center; 
     
     /* 💡 關鍵 2：增加透視感，數值越小透視越誇張 (原本是 1000px) */
-    transition: transform 0.15s ease-out, height 0.15s ease-out;
+    transition: transform 0.1s ease-out, height 0.1s ease-out;
     z-index: 2;
 }
 
@@ -103,7 +103,7 @@
         background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
         border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         z-index: 5; /* 在最前層 */
-        transition: transform 0.15s ease-out ;
+        transition: transform 0.13s ease-out ;
         pointer-events: none;
     }
 
@@ -112,7 +112,7 @@
 .handle-wrapper.active .handle-stick { 
     /* 💡 關鍵 3：使用負的角度，並稍微增加 scale 強化「近大」的感覺 */
     height: 37vh;        /* 👈 1. 改高度：數值越小桿子越短 (例如 25vh) */
-    
+    transform: translateY(160px); /* 👈 2. 改位移：數值越大桿子越低 (例如 180px) */
     transform: rotateX(-30deg) scale(1.1); 
 }
 
@@ -122,7 +122,7 @@
     /* 數值請根據您的畫面微調 (例如 250px 到 350px 之間) */
     transform: translateY(200px) scale(1.2); 
     /* 💡 加上 scale(1.2) 會讓球也跟著變大，更有「彈出來」的感覺 */
-    transition: transform 0.2s ease-in;
+    transition: transform 0.15s ease-in;
 }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
