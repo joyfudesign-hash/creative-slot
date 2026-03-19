@@ -22,9 +22,47 @@
     .hidden { display: none !important; }
 
     /* 等待介面樣式 */
-    #wait-view { text-align: center; background: rgba(20,20,20,0.9); padding: 40px; border-radius: 30px; border: 5px solid var(--gold); }
-    #counter { font-size: 80px; font-weight: bold; color: #ff3131; margin: 10px; }
-    .btn-go { background: linear-gradient(180deg, #3498db, #2980b9); color: white; border: none; padding: 15px 50px; border-radius: 60px; font-size: 24px; cursor: pointer; font-weight: bold; }
+    #wait-view { 
+        text-align: center; 
+        background: rgba(20,20,20,0.95); 
+        padding: 60px;          /* 增加內距 */
+        border-radius: 40px; 
+        border: 8px solid var(--gold); /* 金邊加粗 */
+        width: 70vw;           /* 寬度從原本的預設改為螢幕的 70% */
+        max-width: 900px;      /* 最大寬度限制 */
+    }
+    
+    #wait-view h1 { 
+        font-size: 60px !important; /* 標題「創意碎片期待值」放大 */
+        margin-bottom: 20px; 
+    }
+
+    #counter { 
+        font-size: 150px;       /* 數字放超級大 */
+        font-weight: bold; 
+        color: #ff3131; 
+        margin: 20px; 
+    }
+
+    /* 關鍵：強制放大 QR Code 圖片 */
+    #qrcode img, #qrcode canvas {
+        width: 450px !important;  /* 強制寬度 450px */
+        height: 450px !important; /* 強制高度 450px */
+        border: 25px solid white; /* 加上厚厚白邊，這對遠距離掃描極重要！ */
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .btn-go { 
+        background: linear-gradient(180deg, #3498db, #2980b9); 
+        color: white; border: none; 
+        padding: 25px 80px;    /* 按鈕也放大 */
+        border-radius: 80px; 
+        font-size: 36px;       /* 按鈕字體放大 */
+        cursor: pointer; 
+        font-weight: bold; 
+        margin-top: 30px;
+    }
 
     /* 1. 老虎機主體 */
     #slot-view { 
@@ -232,7 +270,12 @@
         }
     }
 
-    new QRCode(document.getElementById("qrcode"), { text: window.location.href.replace('admin.html', 'index.html'), width: 130, height: 130 });
+    // 將 width 和 height 改為 400，產生的 QR Code 會更細緻，掃描率更高
+    new QRCode(document.getElementById("qrcode"), { 
+        text: window.location.href.replace('admin.html', 'index.html'), 
+        width: 400, 
+        height: 400 
+    });
     function fetchData() { fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => { allData = data; document.getElementById('counter').innerText = data.who.length; }); }
     setInterval(fetchData, 3000); fetchData();
 </script>
