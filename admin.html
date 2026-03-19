@@ -111,7 +111,7 @@
 /* 當按下時：桿子往「前」倒 (往螢幕方向) */
 .handle-wrapper.active .handle-stick { 
     /* 💡 關鍵 3：使用負的角度，並稍微增加 scale 強化「近大」的感覺 */
-    height: 30vh;        /* 👈 1. 改高度：數值越小桿子越短 (例如 25vh) */
+    height: 45vh;        /* 👈 1. 改高度：數值越小桿子越短 (例如 25vh) */
     transform: translateY(150px); /* 👈 2. 改位移：數值越大桿子越低 (例如 180px) */
     transform: rotateX(-30deg) scale(1.1); 
 }
@@ -120,7 +120,7 @@
 .handle-wrapper.active .handle-ball { 
     /* 💡 關鍵 4：因為桿子往前倒會縮短視覺高度，球也要跟著往下平移 */
     /* 數值請根據您的畫面微調 (例如 250px 到 350px 之間) */
-    transform: translateY(280px) scale(1.2); 
+    transform: translateY(250px) scale(1.2); 
     /* 💡 加上 scale(1.2) 會讓球也跟著變大，更有「彈出來」的感覺 */
 }
     
