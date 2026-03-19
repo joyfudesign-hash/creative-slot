@@ -53,8 +53,8 @@
 
     /* 關鍵：QR Code 尺寸調整 */
     #qrcode img, #qrcode canvas {
-        width: 40vh !important;  /* 改用 vh (螢幕高度單位)，確保不會把畫面撐破 */
-        height: 40vh !important; 
+        width: 50vh !important;  /* 改用 vh (螢幕高度單位)，確保不會把畫面撐破 */
+        height: 50vh !important; 
         border: 15px solid white; /* 稍微縮減白邊寬度 */
         border-radius: 10px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -281,8 +281,8 @@
     // 將 width 和 height 改為 400，產生的 QR Code 會更細緻，掃描率更高
     new QRCode(document.getElementById("qrcode"), { 
         text: window.location.href.replace('admin.html', 'index.html'), 
-        width: 400, 
-        height: 400 
+        width: 600, 
+        height: 600 
     });
     function fetchData() { fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => { allData = data; document.getElementById('counter').innerText = data.who.length; }); }
     setInterval(fetchData, 3000); fetchData();
