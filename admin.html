@@ -98,10 +98,30 @@
         transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.1s;
         border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
     }
-    .handle-ball { position: absolute; top: -45px; left: -17px; width: 55px; height: 55px; background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.handle-ball { 
+    position: absolute; 
+    top: -30px; /* 初始位置 */
+    left: -17px; 
+    width: 55px; height: 55px; 
+    background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
+    border-radius: 50%; 
+    box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
+    z-index: 10; /* 確保在最上層 */
     
+    /* 💡 只針對位移做平滑動畫 */
+    transition: transform 0.15s ease-out; 
+}    
     /* 拉桿動作動畫 */
-    .handle-wrapper.active .handle-stick { transform: rotateX(60deg); }
+ /* 桿子依然可以轉動(產生倒下的感覺) */
+.handle-wrapper.active .handle-stick { 
+    transform: rotateX(60deg); 
+}
+
+/* 💡 重點：球不跟著轉，只往下位移 150px (或您覺得合適的高度) */
+.handle-wrapper.active .handle-ball { 
+    transform: translateY(150px); 
+    /* 這裡絕對不會變形，因為它只是在 Y 軸移動 */
+}
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
     @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
