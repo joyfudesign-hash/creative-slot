@@ -92,39 +92,33 @@
     /* 拉桿結構：高度隨比例微調 */
     .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
     .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
-   /* 1. 桿子：移除 z-index:1 與 preserve-3d，避免干擾 */
-    .handle-stick { 
+.handle-stick { 
         position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; 
         background: var(--metal); 
         transform-origin: bottom center;
         transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
-        /* 重要：移除 clip-path */
+        z-index: 1; /* 桿子在後 */
     }
 
-    /* 2. 紅球：強制使用 translateZ 加上大數值的 z-index */
     .handle-ball { 
         position: absolute; 
-        top: -45px; left: -17px; /* 恢復原本位置 */
+        /* 💡 這裡要重新計算位置，讓它對齊桿頭 */
+        bottom: calc(50px + 55vh - 25px); 
+        left: 6.5px; /* (桿子left 24 + 桿寬20/2) - 球寬55/2 = 6.5px */
         width: 55px; height: 55px; 
         background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); 
         border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
-        transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         
-        /* 核心關鍵：確保它在最前面 */
-        z-index: 999; 
-        transform: translateZ(100px); 
+        /* 💡 讓球也跟著底部旋轉，且永遠在最前面 */
+        transform-origin: center calc(25px + 55vh); 
+        transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 5; /* 球在前，絕對蓋過桿子 */
     }
 
-    /* 3. 按下時的動作 */
-    .handle-wrapper.active .handle-stick { 
-        transform: rotateX(60deg); 
-    }
-
-    /* 確保按下時，球體依然保有 translateZ(100px) 這個「浮在前方」的屬性 */
-    .handle-wrapper.active .handle-ball { 
-        transform: rotateX(-60deg) translateZ(100px); 
-    }
+    /* 按下時的動作：球與桿子同步旋轉 */
+    .handle-wrapper.active .handle-stick { transform: rotateX(60deg); }
+    .handle-wrapper.active .handle-ball { transform: rotateX(60deg); }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
     @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
@@ -148,9 +142,12 @@
             </div>
             <div class="footer-text">‧亞洲大學創意設計‧</div>
         </div>
-        <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
+        <div class="handle-wrapper" onclick="pullHandle()">
             <div class="handle-base"></div>
-            <div class="handle-stick"><div class="handle-ball"></div></div>
+            <!-- 1. 桿子單獨存在 -->
+            <div class="handle-stick"></div>
+            <!-- 2. 紅球現在是鄰居，不是子元素 -->
+            <div class="handle-ball"></div>
         </div>
     </div>
 </div>
