@@ -86,36 +86,42 @@
     background: var(--metal); 
     border-radius: 10px; 
     box-shadow: 3px 0 5px rgba(0,0,0,0.3);
+    
+    /* 💡 關鍵 1：支點在底部中心 */
     transform-origin: bottom center; 
-    /* 💡 統一彈回時間為 0.15s */
+    
+    /* 💡 關鍵 2：增加透視感，數值越小透視越誇張 (原本是 1000px) */
     transition: transform 0.15s ease-out, height 0.15s ease-out;
     z-index: 2;
 }
 
-.handle-ball { 
-    position: absolute; 
-    bottom: calc(50px + 55vh - 35px); 
-    left: 6.5px; 
-    width: 60px; height: 60px; 
-    background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
-    border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    z-index: 5; 
-    /* 💡 放開彈回：將 0.13s 改回 0.15s，與桿子絕對同步 */
-    transition: transform 0.15s ease-out;
-    pointer-events: none;
-}
+    .handle-ball { 
+        position: absolute; 
+        bottom: calc(50px + 55vh - 35px); /* 對準桿頂 */
+        left: 6.5px; 
+        width: 60px; height: 60px; 
+        background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
+        border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        z-index: 5; /* 在最前層 */
+        transition: transform 0.13s ease-out ;
+        pointer-events: none;
+    }
 
-/* --- 按下動作 --- */
-
+    /* 按下動作 */
+/* 當按下時：桿子往「前」倒 (往螢幕方向) */
 .handle-wrapper.active .handle-stick { 
-    height: 37vh; 
-    /* 💡 合併位移與旋轉，這樣兩個動作才會同時發生 */
-    transform: translateY(160px) rotateX(-30deg) scale(1.1); 
+    /* 💡 關鍵 3：使用負的角度，並稍微增加 scale 強化「近大」的感覺 */
+    height: 37vh;        /* 👈 1. 改高度：數值越小桿子越短 (例如 25vh) */
+    transform: translateY(160px); /* 👈 2. 改位移：數值越大桿子越低 (例如 180px) */
+    transform: rotateX(-30deg) scale(1.1); 
 }
 
+/* 當按下時：紅球跟著往下掉 */
 .handle-wrapper.active .handle-ball { 
+    /* 💡 關鍵 4：因為桿子往前倒會縮短視覺高度，球也要跟著往下平移 */
+    /* 數值請根據您的畫面微調 (例如 250px 到 350px 之間) */
     transform: translateY(200px) scale(1.2); 
-    /* 💡 按下的速度 0.15s OK，若按下時球還是太快，這裡可以調到 0.18s */
+    /* 💡 加上 scale(1.2) 會讓球也跟著變大，更有「彈出來」的感覺 */
     transition: transform 0.15s ease-in;
 }
     
