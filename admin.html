@@ -14,60 +14,50 @@
         #counter { font-size: 80px; font-weight: bold; color: #ff3131; margin: 10px; }
         .btn-go { background: linear-gradient(180deg, #3498db, #2980b9); color: white; border: none; padding: 15px 50px; border-radius: 60px; font-size: 24px; cursor: pointer; font-weight: bold; }
 
-        /* 老虎機本體 (自適應) */
-        #slot-view { 
-            display: flex; align-items: flex-end; justify-content: center; 
-            width: 98vw; height: 90vh; /* 調高視窗佔用比例 */
-        }
+        /* 1. 調整整體佔用比例，留出黑色邊界 */
+    #slot-view { 
+        display: flex; align-items: flex-end; justify-content: center; 
+        width: 90vw;   /* 從 98vw 縮小到 90vw，留出左右空間 */
+        height: 85vh;  /* 從 90vh 縮小到 85vh，留出上下空間 */
+        max-width: 1400px; /* 限制超大螢幕下的最大寬度 */
+        margin: auto;
+    }
 
-        .slot-machine { 
-            background: var(--red-main); 
-            flex: 1; height: 100%; border-radius: 40px; border: 12px solid var(--red-dark); 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; align-items: center; padding: 20px 30px; box-sizing: border-box;
-        }
-        /* 狂野立體標題 (非斜體，增加下間距) */
-        .machine-title { 
-            font-size: clamp(2.5rem, 6vw, 4rem); 
-            margin: 20px 0 40px 0; /* 增加 Margin-bottom 下移捲軸 */
-            color: #fff; text-transform: uppercase; font-weight: 900; letter-spacing: 3px;
-            text-shadow: 0 5px 0 #aaa, 0 0 25px #ff3131; flex-shrink: 0;
-        }
-        /* 捲軸區 (深陷感 + image_3.png 的漸層) */
-        .slots-viewport { 
-            width: 100%; height: 60%; background: #111; border-radius: 20px; border: 8px solid #222; outline: 5px solid var(--gold); 
-            box-shadow: inset 0 35px 35px rgba(0,0,0,0.8), inset 0 -35px 35px rgba(0,0,0,0.8);
-            display: flex; overflow: hidden; flex-shrink: 0;
-        }
-        .slot-column { 
-            width: 33.33%; display: flex; align-items: center; justify-content: center; border-right: 2px solid rgba(0,0,0,0.2); 
-            background: linear-gradient(180deg, #dcdcdc 0%, #fff 35%, #fff 65%, #dcdcdc 100%);
-        }
-        .slot-column:last-child { border-right: none; }
-        /* 文字大小由 JS 動態控制，這裡提供基礎預設 */
-        /* 提高初始字體大小，並改為垂直居中 */
-        .slot-item { 
-            font-size: 80px; /* 從 55 提高到 80 */
-            font-weight: 900; color: #222; text-align: center; 
-            width: 95%; word-break: break-all; transition: font-size 0.2s; 
-            white-space: normal; line-height: 1.2;
-            display: flex; align-items: center; justify-content: center; height: 100%;
-        }
-        /* 拉桿結構與彈回動畫 */
-        .handle-wrapper { width: 70px; height: 80vh; position: relative; cursor: pointer; margin-left: 20px; flex-shrink: 0; }
-        .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
-        .handle-stick { 
-            position: absolute; bottom: 50px; left: 24px; width: 20px; height: 60vh; background: var(--metal); 
-            transform-origin: bottom center; /* 支點在底座 */
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.1s; /* 擬真彈回 */
-            border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
-        }
-        .handle-ball { position: absolute; top: -45px; left: -17px; width: 55px; height: 55px; background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5); }
-        /* 拉桿啟動狀態：正確旋轉，球不壓扁 */
-        .handle-wrapper.active .handle-stick { transform: rotateX(60deg); }
-        
-        .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
-        @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
+    .slot-machine { 
+        background: var(--red-main); 
+        flex: 1; height: 100%; border-radius: 40px; border: 12px solid var(--red-dark); 
+        box-shadow: 0 30px 60px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6);
+        display: flex; flex-direction: column; align-items: center; padding: 30px; box-sizing: border-box;
+    }
+
+    /* 2 & 3. 標題放大、間距加大、陰影改為模糊黑色 */
+    .machine-title { 
+        font-size: clamp(3rem, 8vw, 5.5rem); /* 進一步加大標題字體 */
+        margin: 30px 0 60px 0; /* 顯著增加 Margin-bottom (60px) 讓捲軸下移 */
+        color: #fff; font-weight: 900; letter-spacing: 5px;
+        /* 改用模糊的黑色立體陰影 */
+        text-shadow: 5px 5px 15px rgba(0, 0, 0, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.9); 
+        flex-shrink: 0;
+    }
+
+    /* 捲軸高度微調，確保下移後的比例 */
+    .slots-viewport { 
+        width: 100%; height: 55%; /* 稍微調降高度比例以配合下移 */
+        background: #111; border-radius: 20px; border: 8px solid #222; outline: 5px solid var(--gold); 
+        box-shadow: inset 0 35px 35px rgba(0,0,0,0.8), inset 0 -35px 35px rgba(0,0,0,0.8);
+        display: flex; overflow: hidden; flex-shrink: 0;
+    }
+
+    /* 文字基礎大小維持現況，確保 JS 縮放邏輯有空間運作 */
+    .slot-item { 
+        font-size: 80px; font-weight: 900; color: #222; text-align: center; 
+        width: 95%; word-break: break-all; transition: font-size 0.2s; 
+        white-space: normal; line-height: 1.2;
+        display: flex; align-items: center; justify-content: center; height: 100%;
+    }
+
+    /* 拉桿稍微縮短一點點，配合整體縮小的比例 */
+    .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
     </style>
 </head>
 <body>
