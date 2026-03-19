@@ -118,12 +118,16 @@
         </div>
 
         <!-- 拉桿：乾淨的結構 -->
-        <div id="handle" class="handle-wrapper" onclick="pullHandle()">
-            <div class="handle-base"></div>
-            <div class="handle-stick">
-                <div class="handle-ball"></div>
-            </div>
-        </div>
+<!-- 改用 onmousedown 和 onmouseup/onmouseleave 組合 -->
+<div id="handle" class="handle-wrapper" 
+     onmousedown="handleDown()" 
+     onmouseup="handleUp()" 
+     onmouseleave="handleUp()">
+    <div class="handle-base"></div>
+    <div class="handle-stick">
+        <div class="handle-ball"></div>
+    </div>
+</div>
     </div>
 </div>
 
