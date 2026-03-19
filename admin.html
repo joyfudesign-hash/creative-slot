@@ -6,24 +6,196 @@
     <title>創意思考老虎機 (專業安靜版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --gold: #ffd700; --bg: #121212; --red: #8b0000; }
-        body { font-family: "Microsoft JhengHei", sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; color: white; }
-        .container { width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .hidden { display: none !important; }
-        #wait-view { text-align: center; background: rgba(0,0,0,0.8); padding: 30px; border-radius: 20px; border: 4px solid var(--gold); }
-        #counter { font-size: 100px; font-weight: bold; color: #e74c3c; margin: 10px; }
-        .btn-go { background: #2980b9; color: white; border: none; padding: 15px 50px; border-radius: 50px; font-size: 24px; cursor: pointer; font-weight: bold; }
-        #slot-view { display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
-        .slot-machine { background: var(--red); width: 85vw; max-width: 850px; height: 75vh; border-radius: 30px; border: 12px solid #4a0000; display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box; }
-        .slots-viewport { width: 100%; flex: 1; background: #fff; border-radius: 15px; border: 8px solid var(--gold); display: flex; overflow: hidden; position: relative; }
-        .slot-column { width: 33.33%; display: flex; align-items: center; justify-content: center; border-right: 2px solid #eee; }
-        .slot-item { font-size: 3.5rem; font-weight: bold; color: #333; text-align: center; width: 90%; word-break: break-all; }
-        .handle-wrapper { width: 70px; height: 50vh; margin-left: 25px; position: relative; cursor: pointer; }
-        .handle-stick { position: absolute; bottom: 80px; left: 25px; width: 20px; height: 35vh; background: linear-gradient(to right, #bdbdbd, #fff, #bdbdbd); transform-origin: bottom center; transition: 0.2s; border-radius: 10px; }
-        .handle-ball { position: absolute; top: -45px; left: -20px; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, #ff5e5e, #8b0000); border-radius: 50%; }
-        .handle-wrapper.active .handle-stick { transform: rotateX(60deg) translateY(20px); }
-        .blur-animate { animation: scrollBlur 0.12s infinite linear; filter: blur(6px); opacity: 0.5; }
-        @keyframes scrollBlur { 0% { transform: translateY(-40px); } 50% { transform: translateY(0px); } 100% { transform: translateY(40px); } }
+       :root { 
+        --gold: #ffd700; 
+        --bg: #0a0a0a; 
+        --red-main: #9e0000; 
+        --red-dark: #4a0000;
+        --metal: linear-gradient(145deg, #bdbdbd, #ffffff, #858585);
+    }
+
+    body { 
+        font-family: "Microsoft JhengHei", "Arial Black", sans-serif; 
+        background: var(--bg); 
+        margin: 0; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        min-height: 100vh; 
+        color: white; 
+    }
+
+    .container { 
+        width: 100vw; 
+        height: 100vh; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center; 
+    }
+
+    .hidden { display: none !important; }
+
+    /* --- 預備畫面 --- */
+    #wait-view { 
+        text-align: center; 
+        background: rgba(20,20,20,0.9); 
+        padding: 40px; 
+        border-radius: 30px; 
+        border: 5px solid var(--gold); 
+        box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+    }
+    #counter { font-size: clamp(60px, 15vw, 120px); font-weight: bold; color: #ff3131; margin: 10px; text-shadow: 0 0 20px rgba(255,0,0,0.5); }
+    .btn-go { background: linear-gradient(180deg, #3498db, #2980b9); color: white; border: none; padding: 20px 60px; border-radius: 60px; font-size: 28px; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    .btn-go:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+    /* --- 老虎機主體 (自適應螢幕) --- */
+    #slot-view { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        width: 95vw; /* 撐滿螢幕寬度 */
+        max-width: 1200px; 
+        height: 90vh; 
+    }
+
+    .slot-machine { 
+        background: var(--red-main); 
+        width: 100%; 
+        height: 100%; 
+        border-radius: 50px; 
+        border: 15px solid var(--red-dark); 
+        box-shadow: 
+            0 20px 50px rgba(0,0,0,0.8),
+            inset 0 0 30px rgba(0,0,0,0.6); /* 機身內陰影 */
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        padding: 2% 4% 5% 4%; /* 比例縮放 Padding */
+        box-sizing: border-box; 
+        position: relative;
+    }
+
+    /* 狂野立體標題 */
+    .machine-title { 
+        font-size: clamp(2.5rem, 8vw, 5rem); /* 隨螢幕縮放大小 */
+        margin: 20px 0; 
+        color: #fff; 
+        text-transform: uppercase;
+        font-style: italic;
+        font-weight: 900;
+        letter-spacing: 5px;
+        text-shadow: 
+            0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 
+            0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 
+            0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 
+            0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15),
+            0 0 30px #ff3131; /* 霓虹底光 */
+        flex-shrink: 0;
+    }
+
+    /* 捲軸區 (深陷感) */
+    .slots-viewport { 
+        width: 100%; 
+        flex: 1; 
+        background: #111; 
+        border-radius: 25px; 
+        border: 10px solid #222; /* 深色內層框 */
+        outline: 6px solid var(--gold); /* 外層金邊 */
+        box-shadow: 
+            inset 0 40px 40px rgba(0,0,0,0.9), /* 深度關鍵：強烈的內陰影 */
+            inset 0 -40px 40px rgba(0,0,0,0.9);
+        display: flex; 
+        overflow: hidden; 
+        position: relative; 
+    }
+
+    .slot-column { 
+        width: 33.33%; 
+        display: flex; align-items: center; justify-content: center; 
+        border-right: 3px solid rgba(0,0,0,0.2); 
+        background: linear-gradient(180deg, #888 0%, #fff 25%, #fff 75%, #888 100%); /* 捲軸漸層 */
+    }
+    .slot-column:last-child { border-right: none; }
+
+    .slot-item { 
+        font-size: clamp(2rem, 5vw, 4.5rem); 
+        font-weight: 900; 
+        color: #222; 
+        text-align: center; 
+        width: 90%; 
+        word-break: break-all; 
+        transition: 0.1s;
+    }
+
+    /* --- 擬真拉桿與底座 --- */
+    .handle-container { 
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        margin-left: 30px; 
+    }
+
+    .handle-wrapper { 
+        width: 80px; 
+        height: 60vh; 
+        position: relative; 
+        cursor: pointer; 
+    }
+
+    /* 梯形立體底座 */
+    .handle-base { 
+        position: absolute; 
+        bottom: 0; 
+        width: 100px; 
+        height: 120px; 
+        left: -10px;
+        background: linear-gradient(145deg, #444, #222);
+        clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); /* 梯形造型 */
+        border-radius: 5px;
+        box-shadow: inset 2px 2px 5px rgba(255,255,255,0.2), 5px 5px 15px rgba(0,0,0,0.5);
+    }
+
+    .handle-stick { 
+        position: absolute; 
+        bottom: 60px; 
+        left: 30px; 
+        width: 22px; 
+        height: 45vh; 
+        background: var(--metal);
+        transform-origin: bottom center; 
+        transition: transform 0.2s cubic-bezier(0.45, 0.05, 0.55, 0.95), height 0.2s; 
+        border-radius: 11px;
+        box-shadow: 5px 0 10px rgba(0,0,0,0.3);
+    }
+
+    /* 擬真紅球 (解決壓扁問題) */
+    .handle-ball { 
+        position: absolute; 
+        top: -50px; 
+        left: -19px; 
+        width: 60px; 
+        height: 60px; 
+        background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%);
+        border-radius: 50%; 
+        box-shadow: 4px 8px 15px rgba(0,0,0,0.6);
+        transition: transform 0.2s, top 0.2s;
+    }
+
+    /* 拉桿啟動狀態：位移 + 縮放透視 */
+    .handle-wrapper.active .handle-stick { 
+        transform: rotateX(45deg); 
+        height: 38vh; /* 桿身縮短 */
+    }
+    .handle-wrapper.active .handle-ball { 
+        transform: scale(0.85); /* 球體縮小模擬後退 */
+        top: -30px; /* 位置微調 */
+        filter: brightness(0.7); /* 進入陰影 */
+    }
+
+    /* 模糊動畫 */
+    .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(8px); opacity: 0.6; }
+    @keyframes scrollBlur { 0% { transform: translateY(-50px); } 100% { transform: translateY(50px); } }
     </style>
 </head>
 <body>
