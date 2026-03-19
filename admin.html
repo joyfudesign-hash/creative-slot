@@ -92,39 +92,38 @@
     /* 拉桿結構：高度隨比例微調 */
     .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
     .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
-    /* 1. 桿子改回旋轉模式 */
-.handle-stick { 
+   /* 1. 桿子：移除 z-index:1 與 preserve-3d，避免干擾 */
+    .handle-stick { 
         position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; 
         background: var(--metal); 
         transform-origin: bottom center;
         transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
-        transform-style: preserve-3d;
-        z-index: 1;
-        /* 💡 關鍵：把桿子頂端的一小部分切掉，讓紅球顯露出來 */
-        clip-path: inset(20px 0 0 0); 
+        /* 重要：移除 clip-path */
     }
 
-    /* 2. 紅球：加上關鍵的補償 transition */
+    /* 2. 紅球：強制使用 translateZ 加上大數值的 z-index */
     .handle-ball { 
         position: absolute; 
-        /* 💡 調整 top，讓球剛好蓋在被切掉的缺口上 */
-        top: -35px; left: -17px; 
+        top: -45px; left: -17px; /* 恢復原本位置 */
         width: 55px; height: 55px; 
         background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); 
         border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
         transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        z-index: 2;
+        
+        /* 核心關鍵：確保它在最前面 */
+        z-index: 999; 
+        transform: translateZ(100px); 
     }
 
-    /* 3. 按下時：桿子轉 60 度，但球體「反方向」轉回 60 度 */
+    /* 3. 按下時的動作 */
     .handle-wrapper.active .handle-stick { 
         transform: rotateX(60deg); 
     }
 
-    /* 球體補償：同時包含「反向旋轉」與「往前拉近」 */
+    /* 確保按下時，球體依然保有 translateZ(100px) 這個「浮在前方」的屬性 */
     .handle-wrapper.active .handle-ball { 
-        transform: rotateX(-60deg) translateZ(10px); 
+        transform: rotateX(-60deg) translateZ(100px); 
     }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
