@@ -93,15 +93,24 @@
     .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
     .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
     .handle-stick { 
-        position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; background: var(--metal); 
+        position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; 
+        background: var(--metal); 
         transform-origin: bottom center; 
-        transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.1s;
+        /* 移除 rotate，改用單純的位移過渡 */
+        transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
     }
-    .handle-ball { position: absolute; top: -45px; left: -17px; width: 55px; height: 55px; background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .handle-ball { 
+        position: absolute; top: -45px; left: -17px; width: 55px; height: 55px; 
+        background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); 
+        border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
+    }
     
     /* 拉桿動作動畫 */
-    .handle-wrapper.active .handle-stick { transform: rotateX(60deg); }
+    .handle-wrapper.active .handle-stick { 
+        height: 25vh;        /* 桿子縮短 */
+        transform: translateY(20vh); /* 整根往下移 */
+    }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
     @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
