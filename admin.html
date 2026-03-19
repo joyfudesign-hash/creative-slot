@@ -92,24 +92,33 @@
     /* 拉桿結構：高度隨比例微調 */
     .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
     .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
+    /* 1. 桿子改回旋轉模式 */
     .handle-stick { 
         position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; 
         background: var(--metal); 
-        transform-origin: bottom center; 
-        /* 移除 rotate，改用單純的位移過渡 */
-        transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: bottom center; /* 以底部為支點旋轉 */
+        transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
+        /* 增加 3D 渲染層級 */
+        transform-style: preserve-3d;
     }
+
+    /* 2. 紅球：加上關鍵的補償 transition */
     .handle-ball { 
         position: absolute; top: -45px; left: -17px; width: 55px; height: 55px; 
         background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); 
         border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
+        /* 確保球體動作跟桿子同步 */
+        transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    
-    /* 拉桿動作動畫 */
+
+    /* 3. 按下時：桿子轉 60 度，但球體「反方向」轉回 60 度 */
     .handle-wrapper.active .handle-stick { 
-        height: 25vh;        /* 桿子縮短 */
-        transform: translateY(20vh); /* 整根往下移 */
+        transform: rotateX(60deg); /* 桿子往前倒 */
+    }
+
+    .handle-wrapper.active .handle-ball { 
+        transform: rotateX(-60deg); /* 球體反過來轉，修正透視導致的壓扁感 */
     }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
