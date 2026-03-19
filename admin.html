@@ -122,6 +122,7 @@
     /* 數值請根據您的畫面微調 (例如 250px 到 350px 之間) */
     transform: translateY(190px) scale(1.2); 
     /* 💡 加上 scale(1.2) 會讓球也跟著變大，更有「彈出來」的感覺 */
+    transition: transform 0.25s ease-in;
 }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
