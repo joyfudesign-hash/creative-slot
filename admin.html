@@ -26,7 +26,7 @@
     #counter { font-size: 80px; font-weight: bold; color: #ff3131; margin: 10px; }
     .btn-go { background: linear-gradient(180deg, #3498db, #2980b9); color: white; border: none; padding: 15px 50px; border-radius: 60px; font-size: 24px; cursor: pointer; font-weight: bold; }
 
-    /* 1. 老虎機主體：縮小比例 (50vw, 85vh) 以留出四周黑色邊界 */
+    /* 1. 老虎機主體 */
     #slot-view { 
         display: flex; align-items: flex-end; justify-content: center; 
         width: 85vw; height: 85vh; max-width: 95%; margin: auto;
@@ -38,7 +38,6 @@
         display: flex; flex-direction: column; align-items: center; padding: 30px; box-sizing: border-box; flex-shrink: 0; 
     }
 
-    /* 2. 標題：加大字體、下間距加大 (60px) 讓捲軸下移、改為黑色模糊陰影 */
     .machine-title { 
         font-size: clamp(3rem, 8vw, 5.5rem); 
         margin: 30px 0 60px 0; 
@@ -47,41 +46,25 @@
         flex-shrink: 0;
     }
     .footer-text {
-        font-size: 24px;       /* 字體大小 */
-        font-weight: bold;     /* 粗體 */
-        color: rgba(252, 252, 252, 0.7);          /* 灰色 */
-        margin-top: 40px;      /* 與上方卷軸區的間距 */
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* 陰影 */
-        letter-spacing: 8px;    /* 字距，增加質感 */
-        flex-shrink: 0;
+        font-size: 24px; font-weight: bold; color: rgba(252, 252, 252, 0.7); 
+        margin-top: 40px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 8px; flex-shrink: 0;
     }
-    /* 捲軸視窗高度微調 */
+
     .slots-viewport { 
-        width: 90%;       /* 縮小寬度，讓左右留出紅色邊框 */
-        margin: 0 auto;   /* 關鍵！讓縮小後的卷軸區保持在中間 */
-        height: 55%; 
-        background: #111; 
-        border-radius: 20px; 
-        border: 8px solid #222; 
-        outline: 5px solid var(--gold); 
+        width: 90%; margin: 0 auto; height: 55%; 
+        background: #111; border-radius: 20px; 
+        border: 8px solid #222; outline: 5px solid var(--gold); 
         box-shadow: inset 0 35px 35px rgba(0,0,0,0.8), inset 0 -35px 35px rgba(0,0,0,0.8);
-        display: flex; 
-        overflow: hidden; 
-        flex-shrink: 0;
+        display: flex; overflow: hidden; flex-shrink: 0;
     }
 
     .slot-column { 
-        width: 33.33%; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        /* 這裡就是分隔線 */
-        border-right: 3px solid rgba(0,0,0,0.5); /* 將 2px 改為 3px(加粗)，rgba 的最後一個值 0.2 改為 0.5(加深) */
+        width: 33.33%; display: flex; align-items: center; justify-content: center; 
+        border-right: 3px solid rgba(0,0,0,0.5); 
         background: linear-gradient(180deg, #dcdcdc 0%, #fff 35%, #fff 65%, #dcdcdc 100%);
     }
     .slot-column:last-child { border-right: none; }
 
-    /* 文字樣式：維持 80px 基礎大小，居中顯示 */
     .slot-item { 
         font-size: 80px; font-weight: 900; color: #222; text-align: center; 
         width: 95%; word-break: break-all; transition: font-size 0.2s; 
@@ -89,39 +72,34 @@
         display: flex; align-items: center; justify-content: center; height: 100%;
     }
 
-    /* 拉桿結構：高度隨比例微調 */
-    .handle-wrapper { width: 80px; height: 75vh; position: relative; cursor: pointer; margin-left: 20px; perspective: 1000px; }
+    /* --- 拉桿區：保證紅球不變形的核心樣式 --- */
+    .handle-wrapper { width: 80px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; perspective: 1000px; }
     
-    .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; background: #333; border-radius: 5px; clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%); z-index: 1; }
-  .handle-stick { 
-        position: absolute; bottom: 40px; left: 30px; width: 20px; height: 50vh; 
+    .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%); z-index: 1; }
+
+    .handle-stick { 
+        position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; 
         background: var(--metal); border-radius: 10px;
         transform-origin: bottom center;
         transition: transform 0.15s ease-out;
         z-index: 2;
     }
-.handle-ball { 
+
+    .handle-ball { 
         position: absolute; 
-        /* 初始位置：50vh(桿高) + 40px(底部偏移) - 30px(球半徑修正) */
-        bottom: calc(50vh + 10px); 
-        left: 10px; 
+        bottom: calc(50px + 55vh - 25px); /* 對準桿頂 */
+        left: 6.5px; 
         width: 60px; height: 60px; 
-        background: radial-gradient(circle at 30% 30%, #ff5555, #990000); 
+        background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
         border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        z-index: 3; /* 確保球在最前面 */
-        transition: transform 0.15s ease-out; /* 只針對位移做動畫 */
+        z-index: 5; /* 在最前層 */
+        transition: transform 0.15s ease-out;
         pointer-events: none;
     }
-    /* 拉桿動作動畫 */
-/* 桿子：旋轉產生倒下感 */
-    .handle-wrapper.active .handle-stick { 
-        transform: rotateX(60deg) scaleY(0.7); 
-    }
 
-    /* 紅球：單純向下位移，保證圓潤不壓縮！ */
-    .handle-wrapper.active .handle-ball { 
-        transform: translateY(320px); /* 如果球太高或太低，修改這個數字即可 */
-    }
+    /* 按下動作 */
+    .handle-wrapper.active .handle-stick { transform: rotateX(60deg); }
+    .handle-wrapper.active .handle-ball { transform: translateY(350px); } /* 球垂直位移不旋轉 */
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
     @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
@@ -135,6 +113,7 @@
         <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
         <button class="btn-go" onclick="showSlotMachine()">解鎖並啟動 (GO!)</button>
     </div>
+    
     <div id="slot-view" class="hidden">
         <div class="slot-machine">
             <h2 class="machine-title">CREATIVE SLOT</h2>
@@ -145,24 +124,18 @@
             </div>
             <div class="footer-text">‧亞洲大學創意設計‧</div>
         </div>
-        <!-- 這裡開始是新的拉桿區塊 -->
-<div id="handle" class="handle-wrapper" onmousedown="handlePress()" onmouseup="handleRelease()" onmouseleave="handleRelease()">
-    <!-- 1. 底座 -->
-    <div class="handle-base"></div>
-    
-    <!-- 2. 桿子 (獨立，只負責旋轉) -->
-    <div class="handle-stick"></div>
-    
-    <!-- 3. 紅球 (獨立，只負責上下位移，絕對不會扁！) -->
-    <div class="handle-ball"></div>
-</div>
-<!-- 這裡結束 -->
-        <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
+
+        <!-- 修正後的單一拉桿區塊 -->
+        <div id="handle" class="handle-wrapper" 
+             onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" onmouseleave="stopSpinHandle()"
+             ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
             <div class="handle-base"></div>
-            <div class="handle-stick"><div class="handle-ball"></div></div>
+            <div class="handle-stick"></div>
+            <div class="handle-ball"></div>
         </div>
     </div>
 </div>
+
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     let allData = { who: [], where: [], doing: [] }, usedIndices = { who: [], where: [], doing: [] };
@@ -180,18 +153,12 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    // ⭐ ⭐⭐ 文字自動適配邏輯 (核心手術點) ⭐⭐⭐⭐
-function adjustFontSize() {
+    function adjustFontSize() {
         const items = document.querySelectorAll('.slot-item');
-        const defaultFontSize = 80; // 提高初始值
+        const defaultFontSize = 80;
         let currentMaxFontSize = defaultFontSize;
-
-        // 重置為初始大小
         items.forEach(el => el.style.fontSize = defaultFontSize + 'px');
-
-        // 偵測是否真的有文字溢出
         items.forEach(el => {
-            // 如果文字高度超過格子的 80% 或者寬度溢出，才開始縮小
             while ((el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth) && currentMaxFontSize > 30) {
                 currentMaxFontSize -= 5;
                 items.forEach(e => e.style.fontSize = currentMaxFontSize + 'px');
@@ -204,13 +171,13 @@ function adjustFontSize() {
         audioCtx.resume();
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
-        adjustFontSize(); // 初始調整
+        setTimeout(adjustFontSize, 100);
     }
 
     function startSpinHandle() {
         document.getElementById('handle').classList.add('active');
         const items = document.querySelectorAll('.slot-item');
-        items.forEach(el => { el.classList.add('blur-animate'); el.style.fontSize = '55px'; }); // 動時恢復基礎大小
+        items.forEach(el => { el.classList.add('blur-animate'); });
         if (!spinInterval) spinInterval = setInterval(playTick, 100);
         if (!spinTimer) {
             spinTimer = setInterval(() => {
@@ -224,11 +191,11 @@ function adjustFontSize() {
 
     function stopSpinHandle() {
         document.getElementById('handle').classList.remove('active');
-        document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
+        const items = document.querySelectorAll('.slot-item');
+        items.forEach(el => el.classList.remove('blur-animate'));
         clearInterval(spinInterval); spinInterval = null;
         clearInterval(spinTimer); spinTimer = null;
         
-        // 核心不重複抽獎邏輯 (無動)
         if (allData.who.length > 0) {
             ['who','where','doing'].forEach((cat, i) => {
                 if (!usedIndices[cat] || usedIndices[cat].length >= allData[cat].length) usedIndices[cat] = [];
@@ -237,8 +204,7 @@ function adjustFontSize() {
                 usedIndices[cat].push(chosen);
                 document.getElementById('s' + (i+1)).innerText = allData[cat][chosen];
             });
-            // ⭐⭐⭐ 結果生成後，立即調整文字大小 (核心手術點) ⭐⭐⭐
-            setTimeout(adjustFontSize, 50); // 給予極短延遲確保 DOM 更新
+            setTimeout(adjustFontSize, 50);
         }
     }
 
