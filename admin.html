@@ -46,7 +46,15 @@
         text-shadow: 5px 5px 15px rgba(0, 0, 0, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.9); 
         flex-shrink: 0;
     }
-
+    .footer-text {
+        font-size: 24px;       /* 字體大小 */
+        font-weight: bold;     /* 粗體 */
+        color: #555;          /* 灰色 */
+        margin-top: 40px;      /* 與上方卷軸區的間距 */
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* 陰影 */
+        letter-spacing: 2px;    /* 字距，增加質感 */
+        flex-shrink: 0;
+    }
     /* 捲軸視窗高度微調 */
     .slots-viewport { 
         width: 90%;       /* 縮小寬度，讓左右留出紅色邊框 */
@@ -63,7 +71,12 @@
     }
 
     .slot-column { 
-        width: 33.33%; display: flex; align-items: center; justify-content: center; border-right: 2px solid rgba(0,0,0,0.2); 
+        width: 33.33%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        /* 這裡就是分隔線 */
+        border-right: 3px solid rgba(0,0,0,0.5); /* 將 2px 改為 3px(加粗)，rgba 的最後一個值 0.2 改為 0.5(加深) */
         background: linear-gradient(180deg, #dcdcdc 0%, #fff 35%, #fff 65%, #dcdcdc 100%);
     }
     .slot-column:last-child { border-right: none; }
@@ -110,6 +123,7 @@
                 <div class="slot-column"><div id="s2" class="slot-item">？</div></div>
                 <div class="slot-column"><div id="s3" class="slot-item">？</div></div>
             </div>
+            <div class="footer-text">亞洲大學創意設計</div>
         </div>
         <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
             <div class="handle-base"></div>
