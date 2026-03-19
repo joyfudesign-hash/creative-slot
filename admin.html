@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>創意思考老虎機</title>
+    <title>創意思考老虎機 (完美適配版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+    /* 基礎顏色與變數 */
     :root { 
         --gold: #ffd700; --bg: #0d0d0d; --red-main: #9e0000; --red-dark: #4a0000; 
         --metal: linear-gradient(145deg, #bdbdbd, #ffffff, #858585); 
@@ -20,12 +21,12 @@
     .container { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .hidden { display: none !important; }
 
-    /* 等待介面 */
+    /* 等待介面樣式 */
     #wait-view { text-align: center; background: rgba(20,20,20,0.9); padding: 40px; border-radius: 30px; border: 5px solid var(--gold); }
     #counter { font-size: 80px; font-weight: bold; color: #ff3131; margin: 10px; }
     .btn-go { background: linear-gradient(180deg, #3498db, #2980b9); color: white; border: none; padding: 15px 50px; border-radius: 60px; font-size: 24px; cursor: pointer; font-weight: bold; }
 
-    /* 老虎機主體 */
+    /* 1. 老虎機主體：縮小比例 (50vw, 85vh) 以留出四周黑色邊界 */
     #slot-view { 
         display: flex; align-items: flex-end; justify-content: center; 
         width: 85vw; height: 85vh; max-width: 95%; margin: auto;
@@ -37,66 +38,83 @@
         display: flex; flex-direction: column; align-items: center; padding: 30px; box-sizing: border-box; flex-shrink: 0; 
     }
 
+    /* 2. 標題：加大字體、下間距加大 (60px) 讓捲軸下移、改為黑色模糊陰影 */
     .machine-title { 
-        font-size: clamp(3rem, 8vw, 5rem); margin: 20px 0 40px 0; 
-        color: #fff; font-weight: 900; letter-spacing: 5px;
-        text-shadow: 3px 3px 10px rgba(0,0,0,0.8); 
+        font-size: clamp(3rem, 8vw, 5.5rem); 
+        margin: 30px 0 60px 0; 
+        color: #fff; text-transform: uppercase; font-weight: 900; letter-spacing: 5px;
+        text-shadow: 5px 5px 15px rgba(0, 0, 0, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.9); 
+        flex-shrink: 0;
     }
-
+    .footer-text {
+        font-size: 24px;       /* 字體大小 */
+        font-weight: bold;     /* 粗體 */
+        color: rgba(252, 252, 252, 0.7);          /* 灰色 */
+        margin-top: 40px;      /* 與上方卷軸區的間距 */
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* 陰影 */
+        letter-spacing: 8px;    /* 字距，增加質感 */
+        flex-shrink: 0;
+    }
+    /* 捲軸視窗高度微調 */
     .slots-viewport { 
-        width: 95%; height: 50%; background: #111; border-radius: 20px; 
-        border: 8px solid #222; outline: 5px solid var(--gold); 
-        display: flex; overflow: hidden;
+        width: 90%;       /* 縮小寬度，讓左右留出紅色邊框 */
+        margin: 0 auto;   /* 關鍵！讓縮小後的卷軸區保持在中間 */
+        height: 55%; 
+        background: #111; 
+        border-radius: 20px; 
+        border: 8px solid #222; 
+        outline: 5px solid var(--gold); 
+        box-shadow: inset 0 35px 35px rgba(0,0,0,0.8), inset 0 -35px 35px rgba(0,0,0,0.8);
+        display: flex; 
+        overflow: hidden; 
+        flex-shrink: 0;
     }
 
     .slot-column { 
-        width: 33.33%; display: flex; align-items: center; justify-content: center; 
-        border-right: 2px solid rgba(0,0,0,0.3);
-        background: linear-gradient(180deg, #e0e0e0 0%, #fff 40%, #fff 60%, #e0e0e0 100%);
+        width: 33.33%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        /* 這裡就是分隔線 */
+        border-right: 3px solid rgba(0,0,0,0.5); /* 將 2px 改為 3px(加粗)，rgba 的最後一個值 0.2 改為 0.5(加深) */
+        background: linear-gradient(180deg, #dcdcdc 0%, #fff 35%, #fff 65%, #dcdcdc 100%);
     }
+    .slot-column:last-child { border-right: none; }
 
+    /* 文字樣式：維持 80px 基礎大小，居中顯示 */
     .slot-item { 
-        font-size: 70px; font-weight: 900; color: #222; text-align: center; 
-        width: 90%; line-height: 1.2;
+        font-size: 80px; font-weight: 900; color: #222; text-align: center; 
+        width: 95%; word-break: break-all; transition: font-size 0.2s; 
+        white-space: normal; line-height: 1.2;
+        display: flex; align-items: center; justify-content: center; height: 100%;
     }
 
-    .footer-text { font-size: 20px; color: rgba(255,255,255,0.6); margin-top: 30px; letter-spacing: 5px; }
-
-    /* 拉桿樣式 - 最穩定的原始版本 */
-    .handle-wrapper { width: 80px; height: 70vh; position: relative; cursor: pointer; margin-left: 20px; }
-    .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; background: #333; border-radius: 5px; clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%); }
-    
+    /* 拉桿結構：高度隨比例微調 */
+    .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
+    .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
     .handle-stick { 
-        position: absolute; bottom: 40px; left: 30px; width: 20px; height: 50vh; 
-        background: var(--metal); border-radius: 10px;
-        transform-origin: bottom center;
-        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; background: var(--metal); 
+        transform-origin: bottom center; 
+        transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.1s;
+        border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
     }
-
-    .handle-ball { 
-        position: absolute; top: -40px; left: -20px; width: 60px; height: 60px; 
-        background: radial-gradient(circle at 30% 30%, #ff5555, #990000); 
-        border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    }
-
-    /* 按下後的旋轉狀態 */
-    .handle-wrapper.active .handle-stick { transform: rotateX(50deg) scaleY(0.8); }
-
-    .blur-animate { filter: blur(4px); opacity: 0.7; }
-    </style>
+    .handle-ball { position: absolute; top: -45px; left: -17px; width: 55px; height: 55px; background: radial-gradient(circle at 35% 35%, #ff8e8e 0%, #ff0000 30%, #660000 100%); border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    
+    /* 拉桿動作動畫 */
+    .handle-wrapper.active .handle-stick { transform: rotateX(60deg); }
+    
+    .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
+    @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
+</style>
 </head>
 <body>
-
 <div class="container">
-    <!-- 等待介面 -->
     <div id="wait-view">
-        <h1>創意碎片期待值</h1>
+        <h1 style="margin-top:0;">創意碎片期待值</h1>
         <div id="counter">0</div>
-        <div id="qrcode" style="display:flex; justify-content:center; margin:20px;"></div>
-        <button class="btn-go" onclick="showSlotMachine()">GO!</button>
+        <div id="qrcode" style="display:flex; justify-content:center; margin:15px;"></div>
+        <button class="btn-go" onclick="showSlotMachine()">解鎖並啟動 (GO!)</button>
     </div>
-
-    <!-- 老虎機主界面 -->
     <div id="slot-view" class="hidden">
         <div class="slot-machine">
             <h2 class="machine-title">CREATIVE SLOT</h2>
@@ -107,106 +125,94 @@
             </div>
             <div class="footer-text">‧亞洲大學創意設計‧</div>
         </div>
-
-        <!-- 拉桿：按住轉，放開停 -->
-        <div id="handle" class="handle-wrapper" 
-             onmousedown="handlePress()" 
-             onmouseup="handleRelease()" 
-             onmouseleave="handleRelease()"
-             ontouchstart="handlePress()"
-             ontouchend="handleRelease()">
+        <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
             <div class="handle-base"></div>
-            <div class="handle-stick">
-                <div class="handle-ball"></div>
-            </div>
+            <div class="handle-stick"><div class="handle-ball"></div></div>
         </div>
     </div>
 </div>
-
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
-    let allData = { who: [], where: [], doing: [] };
-    let spinTimer = null;
-    let isSpinning = false;
+    let allData = { who: [], where: [], doing: [] }, usedIndices = { who: [], where: [], doing: [] };
+    let spinInterval = null, spinTimer = null;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTick() {
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    // 按下滑鼠：啟動
-    function handlePress() {
-        if (isSpinning) return;
-        isSpinning = true;
-        document.getElementById('handle').classList.add('active');
-        
+    // ⭐ ⭐⭐ 文字自動適配邏輯 (核心手術點) ⭐⭐⭐⭐
+function adjustFontSize() {
         const items = document.querySelectorAll('.slot-item');
-        items.forEach(el => el.classList.add('blur-animate'));
+        const defaultFontSize = 80; // 提高初始值
+        let currentMaxFontSize = defaultFontSize;
 
-        spinTimer = setInterval(() => {
-            playTick();
-            items.forEach((el, i) => {
-                const cat = ['who', 'where', 'doing'][i];
-                if (allData[cat].length > 0) {
-                    el.innerText = allData[cat][Math.floor(Math.random() * allData[cat].length)];
-                }
-            });
-        }, 80);
-    }
+        // 重置為初始大小
+        items.forEach(el => el.style.fontSize = defaultFontSize + 'px');
 
-    // 放開滑鼠：定格
-    function handleRelease() {
-        if (!isSpinning) return;
-        isSpinning = false;
-        document.getElementById('handle').classList.remove('active');
-        clearInterval(spinTimer);
-
-        document.querySelectorAll('.slot-item').forEach((el, i) => {
-            el.classList.remove('blur-animate');
-            const cat = ['who', 'where', 'doing'][i];
-            if (allData[cat].length > 0) {
-                el.innerText = allData[cat][Math.floor(Math.random() * allData[cat].length)];
-            }
-        });
-        setTimeout(adjustFontSize, 50);
-    }
-
-    function adjustFontSize() {
-        const items = document.querySelectorAll('.slot-item');
+        // 偵測是否真的有文字溢出
         items.forEach(el => {
-            let size = 70;
-            el.style.fontSize = size + 'px';
-            while ((el.scrollHeight > el.parentElement.offsetHeight || el.scrollWidth > el.parentElement.offsetWidth) && size > 20) {
-                size -= 2;
-                el.style.fontSize = size + 'px';
+            // 如果文字高度超過格子的 80% 或者寬度溢出，才開始縮小
+            while ((el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth) && currentMaxFontSize > 30) {
+                currentMaxFontSize -= 5;
+                items.forEach(e => e.style.fontSize = currentMaxFontSize + 'px');
             }
         });
     }
 
     function showSlotMachine() {
-        if (allData.who.length === 0) return alert("資料載入中...");
+        if (allData.who.length === 0) return alert("還沒有資料喔！");
+        audioCtx.resume();
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
-        adjustFontSize();
+        adjustFontSize(); // 初始調整
     }
 
-    new QRCode(document.getElementById("qrcode"), { text: window.location.href, width: 130, height: 130 });
-
-    function fetchData() {
-        fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => {
-            allData = data;
-            document.getElementById('counter').innerText = data.who.length;
-        });
+    function startSpinHandle() {
+        document.getElementById('handle').classList.add('active');
+        const items = document.querySelectorAll('.slot-item');
+        items.forEach(el => { el.classList.add('blur-animate'); el.style.fontSize = '55px'; }); // 動時恢復基礎大小
+        if (!spinInterval) spinInterval = setInterval(playTick, 100);
+        if (!spinTimer) {
+            spinTimer = setInterval(() => {
+                items.forEach((el, i) => {
+                    const cat = ['who', 'where', 'doing'][i];
+                    if (allData[cat].length > 0) el.innerText = allData[cat][Math.floor(Math.random() * allData[cat].length)];
+                });
+            }, 60);
+        }
     }
 
-    setInterval(fetchData, 3000);
-    fetchData();
+    function stopSpinHandle() {
+        document.getElementById('handle').classList.remove('active');
+        document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('blur-animate'));
+        clearInterval(spinInterval); spinInterval = null;
+        clearInterval(spinTimer); spinTimer = null;
+        
+        // 核心不重複抽獎邏輯 (無動)
+        if (allData.who.length > 0) {
+            ['who','where','doing'].forEach((cat, i) => {
+                if (!usedIndices[cat] || usedIndices[cat].length >= allData[cat].length) usedIndices[cat] = [];
+                let avail = allData[cat].map((_, idx) => idx).filter(idx => !usedIndices[cat].includes(idx));
+                let chosen = avail[Math.floor(Math.random() * avail.length)];
+                usedIndices[cat].push(chosen);
+                document.getElementById('s' + (i+1)).innerText = allData[cat][chosen];
+            });
+            // ⭐⭐⭐ 結果生成後，立即調整文字大小 (核心手術點) ⭐⭐⭐
+            setTimeout(adjustFontSize, 50); // 給予極短延遲確保 DOM 更新
+        }
+    }
+
+    new QRCode(document.getElementById("qrcode"), { text: window.location.href.replace('admin.html', 'index.html'), width: 130, height: 130 });
+    function fetchData() { fetch(GAS_URL + "?action=get").then(res => res.json()).then(data => { allData = data; document.getElementById('counter').innerText = data.who.length; }); }
+    setInterval(fetchData, 3000); fetchData();
 </script>
-
 </body>
 </html>
