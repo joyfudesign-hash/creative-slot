@@ -90,38 +90,38 @@
     }
 
     /* 拉桿結構：高度隨比例微調 */
-    .handle-wrapper { width: 70px; height: 75vh; position: relative; cursor: pointer; margin-left: 25px; flex-shrink: 0; }
-    .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
-    .handle-stick { 
-        position: absolute; bottom: 50px; left: 24px; width: 20px; height: 55vh; background: var(--metal); 
-        transform-origin: bottom center; 
-        transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.1s;
-        border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
+    .handle-wrapper { width: 80px; height: 75vh; position: relative; cursor: pointer; margin-left: 20px; perspective: 1000px; }
+    
+    .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; background: #333; border-radius: 5px; clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%); z-index: 1; }
+  .handle-stick { 
+        position: absolute; bottom: 40px; left: 30px; width: 20px; height: 50vh; 
+        background: var(--metal); border-radius: 10px;
+        transform-origin: bottom center;
+        transition: transform 0.15s ease-out;
+        z-index: 2;
     }
 .handle-ball { 
-    position: absolute; 
-    top: -30px; /* 初始位置 */
-    left: -17px; 
-    width: 55px; height: 55px; 
-    background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
-    border-radius: 50%; 
-    box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
-    z-index: 10; /* 確保在最上層 */
-    
-    /* 💡 只針對位移做平滑動畫 */
-    transition: transform 0.15s ease-out; 
-}    
+        position: absolute; 
+        /* 初始位置：50vh(桿高) + 40px(底部偏移) - 30px(球半徑修正) */
+        bottom: calc(50vh + 10px); 
+        left: 10px; 
+        width: 60px; height: 60px; 
+        background: radial-gradient(circle at 30% 30%, #ff5555, #990000); 
+        border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        z-index: 3; /* 確保球在最前面 */
+        transition: transform 0.15s ease-out; /* 只針對位移做動畫 */
+        pointer-events: none;
+    }
     /* 拉桿動作動畫 */
- /* 桿子依然可以轉動(產生倒下的感覺) */
-.handle-wrapper.active .handle-stick { 
-    transform: rotateX(60deg); 
-}
+/* 桿子：旋轉產生倒下感 */
+    .handle-wrapper.active .handle-stick { 
+        transform: rotateX(60deg) scaleY(0.7); 
+    }
 
-/* 💡 重點：球不跟著轉，只往下位移 150px (或您覺得合適的高度) */
-.handle-wrapper.active .handle-ball { 
-    transform: translateY(150px); 
-    /* 這裡絕對不會變形，因為它只是在 Y 軸移動 */
-}
+    /* 紅球：單純向下位移，保證圓潤不壓縮！ */
+    .handle-wrapper.active .handle-ball { 
+        transform: translateY(320px); /* 如果球太高或太低，修改這個數字即可 */
+    }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
     @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
@@ -145,6 +145,18 @@
             </div>
             <div class="footer-text">‧亞洲大學創意設計‧</div>
         </div>
+        <!-- 這裡開始是新的拉桿區塊 -->
+<div id="handle" class="handle-wrapper" onmousedown="handlePress()" onmouseup="handleRelease()" onmouseleave="handleRelease()">
+    <!-- 1. 底座 -->
+    <div class="handle-base"></div>
+    
+    <!-- 2. 桿子 (獨立，只負責旋轉) -->
+    <div class="handle-stick"></div>
+    
+    <!-- 3. 紅球 (獨立，只負責上下位移，絕對不會扁！) -->
+    <div class="handle-ball"></div>
+</div>
+<!-- 這裡結束 -->
         <div class="handle-wrapper" id="handle" onmousedown="startSpinHandle()" onmouseup="stopSpinHandle()" ontouchstart="startSpinHandle()" ontouchend="stopSpinHandle()">
             <div class="handle-base"></div>
             <div class="handle-stick"><div class="handle-ball"></div></div>
