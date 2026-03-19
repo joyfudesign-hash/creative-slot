@@ -22,46 +22,54 @@
     .hidden { display: none !important; }
 
     /* 等待介面樣式 */
+    /* 等待介面樣式：確保不超出螢幕且 QR Code 足夠大 */
     #wait-view { 
         text-align: center; 
         background: rgba(20,20,20,0.95); 
-        padding: 60px;          /* 增加內距 */
-        border-radius: 40px; 
-        border: 8px solid var(--gold); /* 金邊加粗 */
-        width: 70vw;           /* 寬度從原本的預設改為螢幕的 70% */
-        max-width: 900px;      /* 最大寬度限制 */
+        padding: 2vh 5vw;       /* 使用 vh/vw 彈性邊距 */
+        border-radius: 30px; 
+        border: 5px solid var(--gold); 
+        width: auto;            /* 寬度隨內容變動 */
+        max-width: 90vw; 
+        max-height: 95vh;       /* 強制限制最高不能超過螢幕 95% */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-sizing: border-box;
     }
     
     #wait-view h1 { 
-        font-size: 60px !important; /* 標題「創意碎片期待值」放大 */
-        margin-bottom: 20px; 
+        font-size: clamp(24px, 4vh, 48px) !important; /* 標題根據螢幕高度縮放 */
+        margin: 10px 0; 
     }
 
     #counter { 
-        font-size: 150px;       /* 數字放超級大 */
+        font-size: clamp(60px, 12vh, 120px); /* 數字根據螢幕高度縮放 */
         font-weight: bold; 
         color: #ff3131; 
-        margin: 20px; 
+        margin: 5px; 
     }
 
-    /* 關鍵：強制放大 QR Code 圖片 */
+    /* 關鍵：QR Code 尺寸調整 */
     #qrcode img, #qrcode canvas {
-        width: 450px !important;  /* 強制寬度 450px */
-        height: 450px !important; /* 強制高度 450px */
-        border: 25px solid white; /* 加上厚厚白邊，這對遠距離掃描極重要！ */
-        border-radius: 15px;
+        width: 40vh !important;  /* 改用 vh (螢幕高度單位)，確保不會把畫面撐破 */
+        height: 40vh !important; 
+        border: 15px solid white; /* 稍微縮減白邊寬度 */
+        border-radius: 10px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        margin: 10px auto;
     }
     
     .btn-go { 
         background: linear-gradient(180deg, #3498db, #2980b9); 
         color: white; border: none; 
-        padding: 25px 80px;    /* 按鈕也放大 */
-        border-radius: 80px; 
-        font-size: 36px;       /* 按鈕字體放大 */
+        padding: 15px 60px; 
+        border-radius: 50px; 
+        font-size: clamp(20px, 3vh, 32px); /* 按鈕文字也自動縮放 */
         cursor: pointer; 
         font-weight: bold; 
-        margin-top: 30px;
+        margin-top: 10px;
     }
 
     /* 1. 老虎機主體 */
