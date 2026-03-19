@@ -112,15 +112,17 @@
         /* 確保球體動作跟桿子同步 */
         transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         z-index: 2;
+        transform: translateZ(10px);
     }
 
     /* 3. 按下時：桿子轉 60 度，但球體「反方向」轉回 60 度 */
     .handle-wrapper.active .handle-stick { 
-        transform: rotateX(60deg); /* 桿子往前倒 */
+        transform: rotateX(60deg); 
     }
 
+    /* 球體補償：同時包含「反向旋轉」與「往前拉近」 */
     .handle-wrapper.active .handle-ball { 
-        transform: rotateX(-60deg); /* 球體反過來轉，修正透視導致的壓扁感 */
+        transform: rotateX(-60deg) translateZ(10px); 
     }
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
