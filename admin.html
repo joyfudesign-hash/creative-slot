@@ -113,6 +113,7 @@
         /* 💡 讓球也跟著底部旋轉，且永遠在最前面 */
         transform-origin: center calc(25px + 55vh); 
         transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: none;
         z-index: 5; /* 球在前，絕對蓋過桿子 */
     }
 
