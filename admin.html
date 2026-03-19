@@ -127,33 +127,6 @@
     
     .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
     @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
-        /* 1. 強力放大中間那個黑底金邊的容器 */
-div[style*="border: 2px solid yellow"] {
-    width: 60% !important;        /* 增加寬度 */
-    max-width: 800px !important;  /* 設定上限 */
-    padding: 50px !important;     /* 增加內距 */
-    border-width: 5px !important; /* 金邊加粗，遠看更清楚 */
-}
-
-/* 2. 強力放大 QR Code 圖片 */
-div[style*="border: 2px solid yellow"] img {
-    width: 400px !important;      /* 寬度直接拉到 400px */
-    height: 400px !important;     /* 高度同步 */
-    margin: 20px auto !important; 
-    border: 20px solid white !important; /* 加上厚白邊，這對遠距離掃描極重要！ */
-    border-radius: 10px;
-}
-
-/* 3. 放大中間的紅色數字 (期待值) */
-#expectation-value {
-    font-size: 120px !important;  /* 讓數字大到像紅綠燈一樣明顯 */
-    margin: 20px 0 !important;
-}
-
-/* 4. 放大標題文字 */
-div[style*="border: 2px solid yellow"] h2 {
-    font-size: 42px !important;
-}
 </style>
 </head>
 <body>
