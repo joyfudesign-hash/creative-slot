@@ -103,7 +103,7 @@
         background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
         border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         z-index: 5; /* 在最前層 */
-        transition: transform 0.13s ease-out, height 0.15s ease-out;
+        transition: transform 0.13s ease-out, ;
         pointer-events: none;
     }
 
@@ -112,7 +112,7 @@
 .handle-wrapper.active .handle-stick { 
     /* 💡 關鍵 3：使用負的角度，並稍微增加 scale 強化「近大」的感覺 */
     height: 37vh;        /* 👈 1. 改高度：數值越小桿子越短 (例如 25vh) */
-    transform: translateY(150px); /* 👈 2. 改位移：數值越大桿子越低 (例如 180px) */
+    transform: translateY(160px); /* 👈 2. 改位移：數值越大桿子越低 (例如 180px) */
     transform: rotateX(-30deg) scale(1.1); 
 }
 
