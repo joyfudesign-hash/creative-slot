@@ -17,13 +17,14 @@
         /* 老虎機本體 (自適應) */
         #slot-view { 
             display: flex; align-items: flex-end; justify-content: center; 
-            width: 95vw; height: 90vh; max-width: 1200px; /* 增加大螢幕投影最大寬度 */
+            width: 98vw; height: 90vh; /* 調高視窗佔用比例 */
         }
+
         .slot-machine { 
             background: var(--red-main); 
             flex: 1; height: 100%; border-radius: 40px; border: 12px solid var(--red-dark); 
             box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.6);
-            display: flex; flex-direction: column; align-items: center; padding: 20px 30px; box-sizing: border-box; flex-shrink: 0; 
+            display: flex; flex-direction: column; align-items: center; padding: 20px 30px; box-sizing: border-box;
         }
         /* 狂野立體標題 (非斜體，增加下間距) */
         .machine-title { 
@@ -44,8 +45,14 @@
         }
         .slot-column:last-child { border-right: none; }
         /* 文字大小由 JS 動態控制，這裡提供基礎預設 */
-        .slot-item { font-size: 55px; font-weight: 900; color: #222; text-align: center; width: 95%; word-break: break-all; transition: font-size 0.2s; white-space: normal; line-height: 1.1; }
-
+        /* 提高初始字體大小，並改為垂直居中 */
+        .slot-item { 
+            font-size: 80px; /* 從 55 提高到 80 */
+            font-weight: 900; color: #222; text-align: center; 
+            width: 95%; word-break: break-all; transition: font-size 0.2s; 
+            white-space: normal; line-height: 1.2;
+            display: flex; align-items: center; justify-content: center; height: 100%;
+        }
         /* 拉桿結構與彈回動畫 */
         .handle-wrapper { width: 70px; height: 80vh; position: relative; cursor: pointer; margin-left: 20px; flex-shrink: 0; }
         .handle-base { position: absolute; bottom: 0; width: 80px; height: 100px; left: -5px; background: linear-gradient(145deg, #555, #222); clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); border-radius: 5px; box-shadow: inset 1px 1px 3px rgba(255,255,255,0.2); }
@@ -104,20 +111,20 @@
     }
 
     // ⭐ ⭐⭐ 文字自動適配邏輯 (核心手術點) ⭐⭐⭐⭐
-    function adjustFontSize() {
+function adjustFontSize() {
         const items = document.querySelectorAll('.slot-item');
-        const defaultFontSize = 55; // CSS 中的基礎大小
-        let minFontSize = defaultFontSize;
+        const defaultFontSize = 80; // 提高初始值
+        let currentMaxFontSize = defaultFontSize;
 
-        // 第一步：初始化所有大小，以便重新計算
+        // 重置為初始大小
         items.forEach(el => el.style.fontSize = defaultFontSize + 'px');
 
-        // 第二步：尋找需要縮小最多的那一格
+        // 偵測是否真的有文字溢出
         items.forEach(el => {
-            while (el.scrollHeight > el.clientHeight || el.scrollWidth > el.clientWidth && minFontSize > 20) {
-                minFontSize -= 2;
-                items.forEach(e => e.style.fontSize = minFontSize + 'px'); // 同步縮小所有格
-                if (minFontSize <= 20) break; // 縮小下限，防止字變不見
+            // 如果文字高度超過格子的 80% 或者寬度溢出，才開始縮小
+            while ((el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth) && currentMaxFontSize > 30) {
+                currentMaxFontSize -= 5;
+                items.forEach(e => e.style.fontSize = currentMaxFontSize + 'px');
             }
         });
     }
