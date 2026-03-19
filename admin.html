@@ -144,6 +144,12 @@
             <div class="footer-text">‧亞洲大學創意設計‧</div>
         </div>
         <div class="handle-wrapper" onclick="pullHandle()">
+            <!-- 加上 id="handle"，這樣 JS 才抓得到它 -->
+<div id="handle" class="handle-wrapper" onclick="pullHandle()">
+    <div class="handle-base"></div>
+    <div class="handle-stick"></div>
+    <div class="handle-ball"></div>
+</div>
             <div class="handle-base"></div>
             <!-- 1. 桿子單獨存在 -->
             <div class="handle-stick"></div>
@@ -153,6 +159,28 @@
     </div>
 </div>
 <script>
+    // 補上這個漏掉的 function
+    function pullHandle() {
+        const handle = document.getElementById('handle');
+        if (handle.classList.contains('active')) return; // 防止重複點擊
+
+        // 1. 開始旋轉動畫與模糊
+        handle.classList.add('active');
+        const items = document.querySelectorAll('.slot-item');
+        items.forEach(el => { 
+            el.classList.add('blur-animate'); 
+            el.innerText = "？"; // 回到問號
+        });
+
+        // 2. 模擬拉桿彈回來的時間 (0.3秒後彈回，並停止滾動)
+        setTimeout(() => {
+            handle.classList.remove('active');
+            stopSpinHandle(); // 這是您原本寫好的停止邏輯
+        }, 300);
+
+        // 3. 啟動滾動效果
+        startSpinHandle(); // 這是您原本寫好的滾動邏輯
+    }
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     let allData = { who: [], where: [], doing: [] }, usedIndices = { who: [], where: [], doing: [] };
     let spinInterval = null, spinTimer = null;
