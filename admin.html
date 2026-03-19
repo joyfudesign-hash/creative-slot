@@ -101,6 +101,7 @@
         border-radius: 10px; box-shadow: 3px 0 5px rgba(0,0,0,0.3);
         /* 增加 3D 渲染層級 */
         transform-style: preserve-3d;
+        z-index: 1;
     }
 
     /* 2. 紅球：加上關鍵的補償 transition */
@@ -110,6 +111,7 @@
         border-radius: 50%; box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
         /* 確保球體動作跟桿子同步 */
         transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 2;
     }
 
     /* 3. 按下時：桿子轉 60 度，但球體「反方向」轉回 60 度 */
