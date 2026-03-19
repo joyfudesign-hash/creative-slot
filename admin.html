@@ -111,6 +111,8 @@
 /* 當按下時：桿子往「前」倒 (往螢幕方向) */
 .handle-wrapper.active .handle-stick { 
     /* 💡 關鍵 3：使用負的角度，並稍微增加 scale 強化「近大」的感覺 */
+    height: 30vh;        /* 👈 1. 改高度：數值越小桿子越短 (例如 25vh) */
+    transform: translateY(150px); /* 👈 2. 改位移：數值越大桿子越低 (例如 180px) */
     transform: rotateX(-30deg) scale(1.1); 
 }
 
