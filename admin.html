@@ -210,6 +210,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyFXIj9VPb2ABXVQttXykbx8yRbD856pptbqJ1iptBhGbThq7wbw68VHj8c7vJVb28/exec";
     let allData = { who: [], where: [], doing: [] }, usedIndices = { who: [], where: [], doing: [] };
     let spinInterval = null, spinTimer = null;
+    let isDragging = false;
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playTick() {
@@ -245,6 +246,7 @@
     }
 
     function startSpinHandle() {
+        isDragging = true; // 標記：開始拉動
         document.getElementById('handle').classList.add('active');
         const items = document.querySelectorAll('.slot-item');
         items.forEach(el => { el.classList.add('blur-animate'); });
@@ -260,23 +262,28 @@
     }
 
     function stopSpinHandle() {
-        document.getElementById('handle').classList.remove('active');
-        const items = document.querySelectorAll('.slot-item');
-        items.forEach(el => el.classList.remove('blur-animate'));
-        clearInterval(spinInterval); spinInterval = null;
-        clearInterval(spinTimer); spinTimer = null;
-        
-        if (allData.who.length > 0) {
-            ['who','where','doing'].forEach((cat, i) => {
-                if (!usedIndices[cat] || usedIndices[cat].length >= allData[cat].length) usedIndices[cat] = [];
-                let avail = allData[cat].map((_, idx) => idx).filter(idx => !usedIndices[cat].includes(idx));
-                let chosen = avail[Math.floor(Math.random() * avail.length)];
-                usedIndices[cat].push(chosen);
-                document.getElementById('s' + (i+1)).innerText = allData[cat][chosen];
-            });
-            setTimeout(adjustFontSize, 50);
-        }
+    // 如果現在根本沒在拉（例如只是滑鼠飄過），就直接結束，不執行後面的亂數邏輯
+    if (!isDragging) return; 
+
+    isDragging = false; // 重置標記：已經放開或離開了
+    
+    document.getElementById('handle').classList.remove('active');
+    const items = document.querySelectorAll('.slot-item');
+    items.forEach(el => el.classList.remove('blur-animate'));
+    clearInterval(spinInterval); spinInterval = null;
+    clearInterval(spinTimer); spinTimer = null;
+    
+    if (allData.who.length > 0) {
+        ['who','where','doing'].forEach((cat, i) => {
+            if (!usedIndices[cat] || usedIndices[cat].length >= allData[cat].length) usedIndices[cat] = [];
+            let avail = allData[cat].map((_, idx) => idx).filter(idx => !usedIndices[cat].includes(idx));
+            let chosen = avail[Math.floor(Math.random() * avail.length)];
+            usedIndices[cat].push(chosen);
+            document.getElementById('s' + (i+1)).innerText = allData[cat][chosen];
+        });
+        setTimeout(adjustFontSize, 50);
     }
+}
 
     // 將 width 和 height 改為 400，產生的 QR Code 會更細緻，掃描率更高
     new QRCode(document.getElementById("qrcode"), { 
