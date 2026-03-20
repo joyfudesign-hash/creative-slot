@@ -191,25 +191,14 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    function adjustFontSize() {
-        const items = document.querySelectorAll('.slot-item');
-        const defaultFontSize = 80;
-        let currentMaxFontSize = defaultFontSize;
-        items.forEach(el => el.style.fontSize = defaultFontSize + 'px');
-        items.forEach(el => {
-            while ((el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth) && currentMaxFontSize > 30) {
-                currentMaxFontSize -= 5;
-                items.forEach(e => e.style.fontSize = currentMaxFontSize + 'px');
-            }
-        });
-    }
+    
 
     function showSlotMachine() {
         if (allData.who.length === 0) return alert("還沒有資料喔！");
         audioCtx.resume();
         document.getElementById('wait-view').classList.add('hidden');
         document.getElementById('slot-view').classList.remove('hidden');
-        setTimeout(adjustFontSize, 100);
+        
     }
 
     function startSpinHandle() {
@@ -248,7 +237,7 @@
             usedIndices[cat].push(chosen);
             document.getElementById('s' + (i+1)).innerText = allData[cat][chosen];
         });
-        setTimeout(adjustFontSize, 50);
+        
     }
 }
 
