@@ -79,10 +79,31 @@
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    border-right: 3px solid rgba(0,0,0,0.5); 
-    /* 💡 大絕招：純白背景 + 絲滑內陰影 */
+    
+    /* 💡 1. 這裡不畫線了，把線條交給下面的 ::after 處理 */
     background: #ffffff; 
-    box-shadow: inset 0 60px 50px -30px rgba(0,0,0,0.5), inset 0 -60px 50px -30px rgba(0,0,0,0.5); 
+    position: relative; /* 💡 必須加這行，當作線條的基準點 */
+
+    /* 💡 2. 這是您喜歡的絲滑陰影 */
+    box-shadow: inset 0 60px 50px -30px rgba(0,0,0,0.5), 
+                inset 0 -60px 50px -30px rgba(0,0,0,0.5); 
+ }
+
+ /* 💡 3. 這就是那兩條線的新畫法：獨立出來，蓋在陰影上面 */
+ .slot-column::after {
+    content: "";
+    position: absolute;
+    right: 0;  /* 靠右邊站 */
+    top: 0;
+    width: 3px; /* 線的寬度 */
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* 線的顏色 */
+    z-index: 5; /* 關鍵：確保它比陰影更靠前，就不會被蓋住了 */
+ }
+
+ /* 💡 4. 最後一格的右邊不需要線，所以把它藏起來 */
+ .slot-column:last-child::after {
+    display: none;
  }
     .slot-column:last-child { border-right: none; }
     .slot-item { font-size: 80px; font-weight: 900; color: #222; text-align: center; width: 95%; word-break: break-all; transition: font-size 0.2s; white-space: normal; line-height: 1.2; display: flex; align-items: center; justify-content: center; height: 100%; }
