@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>創意思考老虎機 (完美適配版)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
+   <style>
     /* 基礎顏色與變數 */
     :root { 
         --gold: #ffd700; --bg: #0d0d0d; --red-main: #9e0000; --red-dark: #4a0000; 
@@ -21,7 +21,7 @@
     .container { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     .hidden { display: none !important; }
 
-    /* 等待介面樣式（維持現狀，已優化過） */
+    /* 等待介面樣式 */
     #wait-view { 
         text-align: center; background: rgba(20,20,20,0.95); 
         padding: 2vh 5vw; border-radius: 30px; border: 5px solid var(--gold); 
@@ -33,7 +33,7 @@
     #qrcode img, #qrcode canvas { width: 45vh !important; height: 45vh !important; border: 15px solid white; border-radius: 10px; margin: 10px auto; }
     .btn-go { background: linear-gradient(180deg, #3498db, #2980b9); color: white; border: none; padding: 15px 60px; border-radius: 50px; font-size: clamp(20px, 3vh, 32px); cursor: pointer; font-weight: bold; margin-top: 10px; }
 
-    /* 1. 老虎機主體：改用 vh 確保高度不穿幫 */
+    /* 1. 老虎機主體 */
     #slot-view { 
         display: flex; align-items: center; justify-content: center; 
         width: 89vw; height: 90vh; max-height: 90vh; margin: auto;
@@ -46,10 +46,8 @@
         z-index: 10;
     }
 
-.machine-title { 
-        /* 💡 放大字體：從 8vh 提高到 10vh，最大到 7.5rem */
+    .machine-title { 
         font-size: clamp(3rem, 10vh, 7.5rem); 
-        /* 💡 縮減邊距，把空間讓給大字 */
         margin: 3.5vh 0 0 0; 
         color: #fff; text-transform: uppercase; font-weight: 900; letter-spacing: 5px;
         text-shadow: 5px 5px 15px rgba(0, 0, 0, 0.8), 2px 2px 0px rgba(0, 0, 0, 0.9); 
@@ -57,120 +55,22 @@
     }
 
     .footer-text {
-        font-size: clamp(14px, 2.5vh, 24px); /* 防跑版：字體隨高度縮放 */
+        font-size: clamp(14px, 2.5vh, 24px); 
         font-weight: bold; color: rgba(252, 252, 252, 0.7); 
         margin-top: auto; padding-bottom: 1vh; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 8px; flex-shrink: 0;
     }
 
-.slots-viewport { 
+    /* 💡 大絕招修改處：將陰影放在容器上，避免格子間產生陰影 */
+    .slots-viewport { 
         width: 95%; 
         height: 55%; 
-        background: #111; border-radius: 20px; 
+        background: #ffffff; border-radius: 20px; 
         border: 8px solid #222; outline: 5px solid var(--gold); 
         display: flex; overflow: hidden;
-        
-        /* 💡 新增這行：自動水平置中，並利用 margin-top 把它往下壓 */
-        /* 5vh 代表離標題遠一點，您可以根據視覺調整這個數字 */
         margin: 6vh auto 0 auto; 
-    }
-
-   .slot-column { 
-    width: 33.33%; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    
-    /* 💡 1. 這裡不畫線了，把線條交給下面的 ::after 處理 */
-    background: #ffffff; 
-    position: relative; /* 💡 必須加這行，當作線條的基準點 */
-
-    /* 💡 2. 這是您喜歡的絲滑陰影 */
-    box-shadow: inset 0 60px 50px -30px rgba(0,0,0,0.5), 
-                inset 0 -60px 50px -30px rgba(0,0,0,0.5); 
- }
-
- /* 💡 3. 這就是那兩條線的新畫法：獨立出來，蓋在陰影上面 */
- .slot-column::after {
-    content: "";
-    position: absolute;
-    right: 0;  /* 靠右邊站 */
-    top: 0;
-    width: 3px; /* 線的寬度 */
-    height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* 線的顏色 */
-    z-index: 5; /* 關鍵：確保它比陰影更靠前，就不會被蓋住了 */
- }
-
- /* 💡 4. 最後一格的右邊不需要線，所以把它藏起來 */
- .slot-column:last-child::after {
-    display: none;
- }
-    .slot-column:last-child { border-right: none; }
-    .slot-item { font-size: 80px; font-weight: 900; color: #222; text-align: center; width: 95%; word-break: break-all; transition: font-size 0.2s; white-space: normal; line-height: 1.2; display: flex; align-items: center; justify-content: center; height: 100%; }
-
-    /* --- 重寫拉桿區：解決穿幫問題 --- */
-    .handle-wrapper { 
-        width: 8vh; height: 70vh; /* 寬度也隨高度縮放，比例更一致 */
-        z-index: 1;
-        position: relative; cursor: pointer; margin-left: 20px; 
-        /* 💡 新增這行：讓整個拉桿容器稍微往下偏移，對準機台底部 */
-        /* 如果還是不夠低，可以把 5vh 改成 7vh */
-        margin-top: 15vh;
-    }
-    
-.handle-base { 
-        position: absolute; 
-        /* 💡 嘗試將 bottom 設為更小的值，甚至是負值 */
-        /* 如果剛才 wrapper 已經下移，這裡設為 0 應該就會貼齊 */
-        bottom: 0vh; 
-        
-        width: 100%; height: 10vh; left: 0; 
-        background: linear-gradient(145deg, #555, #222); 
-        clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%); z-index: 2; 
-    }
-
-.handle-stick { 
-        position: absolute; bottom: 5vh; left: 50%; 
-        /* 💡 寬度從 1.5vh 增加到 2.5vh (變粗) */
-        width: 2.5vh; 
-        /* 💡 高度從 50vh 縮短到 40vh (變短) */
-        height: 40vh; 
-        /* 💡 負的 margin-left 必須是寬度的一半，用來水平置中 */
-        margin-left: -1.25vh; 
-        background: var(--metal); border-radius: 10px; 
-        transform-origin: bottom center; transition: all 0.2s ease-out; z-index: 5;
-    }
-
-    .handle-ball { 
-        position: absolute; 
-        /* 💡 新的起始位置 (支點 5vh + 新桿長 40vh)，先維持原本對齊 */
-        bottom: 44vh; left: 50%; 
-        /* 💡 球也稍微放大，從 6vh 變成 8vh，跟桿子變粗比例才對 */
-        width: 8vh; 
-        height: 8vh; 
-        /* 💡 負的 margin-left 必須是寬度的一半 */
-        margin-left: -4vh; 
-        background: radial-gradient(circle at 35% 35%, #ff8e8e, #ff0000, #660000); 
-        border-radius: 50%; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        z-index: 15; transition: all 0.2s ease-out; pointer-events: none;
-    }
-
-/* 💡 按下動作同步修改 (對應新的桿長 40vh) */
-    .handle-wrapper.active .handle-stick { 
-        /* 💡 按下時桿子縮短到 15vh (原本是 20) */
-        height: 15vh; 
-        transform: scaleY(1.1); 
-    }
-
-    .handle-wrapper.active .handle-ball { 
-        /* 💡 球跟著桿頂降到 (支點 5vh + 按下桿長 15vh) = 20vh */
-        bottom: 20vh; 
-        transform: scale(1.1); /* 稍微縮小 scale，避免放大太多 */
-    }
-    
-    .blur-animate { animation: scrollBlur 0.1s infinite linear; filter: blur(6px); opacity: 0.6; }
-    @keyframes scrollBlur { 0% { transform: translateY(-30px); } 100% { transform: translateY(30px); } }
-</style>
+        position: relative;
+        /* 💡 這裡控制「整個大區塊」的上下絲滑陰影 */
+        box-shadow: inset
 </head>
 <body>
 <div class="container">
